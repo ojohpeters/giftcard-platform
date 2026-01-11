@@ -1,26 +1,78 @@
 @import "tailwindcss";
 
+@theme {
+  /* Geist Sans is now the primary font */
+  --font-sans: var(--font-geist-sans), "Inter", ui-sans-serif, system-ui;
+}
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0a0a0b;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
+/* Force high-end typography and smooth rendering */
+html, body {
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+/* Custom selection color for that premium feel */
+::selection {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+/* --- MAIN GLOBAL SCROLLBAR --- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
+
+/* --- TERMINAL SPECIFIC SCROLLBAR (For the Dark Calculator) --- */
+.terminal-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.terminal-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.terminal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+}
+
+.terminal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6; /* Subtle blue glow on interaction */
+}
+
+/* Utility for the Neo-Brutalism cards */
+.neo-shadow {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 12px 12px 0px 0px rgba(0, 0, 0, 1);
+}
+
+.neo-shadow:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+}
+
+/* Custom utility for tabular numbers (Prices/Rates) */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
