@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { ShieldCheck, Zap, Info, ShoppingCart, Lock } from "lucide-react";
+import { formatIQDShort } from '@/lib/currency';
 
 export default function ProductDetailPage() {
   const [qty, setQty] = useState(1);
@@ -25,7 +26,7 @@ export default function ProductDetailPage() {
             </div>
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">Amazon Card<span className="text-blue-600">.</span></h1>
             <p className="text-xs md:text-sm text-gray-500 font-medium leading-relaxed max-w-md uppercase tracking-tight">
-              Global digital asset for liquidating store credit. Secured by Giftly Terminal protocols. Valid for all regional nodes.
+              Global digital asset for liquidating store credit. Secured by HiGc Terminal protocols. Valid for all regional nodes.
             </p>
           </div>
         </div>
@@ -37,7 +38,7 @@ export default function ProductDetailPage() {
           <div className="bg-[#0A0A0B] rounded-[32px] p-6 md:p-10 text-white border border-white/5 shadow-2xl space-y-8">
             <div className="space-y-2">
               <p className="text-[9px] font-black text-blue-500 uppercase tracking-[0.4em]">Current Liquidity Rate</p>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tighter tabular-nums italic">₦1,240<span className="text-xs md:text-lg text-gray-500 not-italic ml-2">/ $1.00</span></h2>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tighter tabular-nums italic">{formatIQDShort(1240)} IQD<span className="text-xs md:text-lg text-gray-500 not-italic ml-2">/ $1.00</span></h2>
             </div>
 
             <div className="space-y-4">
@@ -45,11 +46,11 @@ export default function ProductDetailPage() {
               <div className="grid grid-cols-2 gap-2">
                 <div className="bg-white/5 border border-white/10 p-3 rounded-2xl">
                   <p className="text-[8px] font-black text-blue-500 uppercase">$100 - $499</p>
-                  <p className="text-sm font-black tabular-nums">₦1,245</p>
+                  <p className="text-sm font-black tabular-nums">{formatIQDShort(1245)} IQD</p>
                 </div>
                 <div className="bg-white/5 border border-white/10 p-3 rounded-2xl">
                   <p className="text-[8px] font-black text-green-500 uppercase">$500+</p>
-                  <p className="text-sm font-black tabular-nums">₦1,260</p>
+                  <p className="text-sm font-black tabular-nums">{formatIQDShort(1260)} IQD</p>
                 </div>
               </div>
             </div>

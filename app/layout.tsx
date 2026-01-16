@@ -2,7 +2,9 @@
 import "./globals.css";
 import { Twitter, Instagram, Globe } from "lucide-react";
 import { Geist } from "next/font/google";
-import Header from "@/components/Header"; 
+import { useEffect } from "react";
+import Header from "@/components/Header";
+import { useAuthStore } from "@/store/authStore";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -10,10 +12,24 @@ const geistSans = Geist({
   weight: ["100", "300", "400", "500", "600", "700", "800", "900"],
 });
 
+function AuthInitializer() {
+  const initialize = useAuthStore((state) => state.initialize);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
+
+  useEffect(() => {
+    if (!isInitialized && typeof window !== 'undefined') {
+      initialize();
+    }
+  }, [initialize, isInitialized]);
+
+  return null;
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`scroll-smooth ${geistSans.variable}`}>
       <body className="bg-white text-[#0A0A0A] antialiased font-sans min-h-screen flex flex-col overflow-x-hidden w-full relative">
+        <AuthInitializer />
         
         {/* GLOBAL HEADER */}
         <Header />
@@ -36,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     G
                   </div>
                   <span className="text-2xl font-black tracking-tighter uppercase italic text-gray-900">
-                    Giftly<span className="text-blue-600">.</span>
+                    HiGc<span className="text-blue-600">.</span>
                   </span>
                 </div>
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] max-w-xs leading-relaxed">
@@ -69,10 +85,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center w-full md:w-auto">
                 <div className="flex items-center gap-3 text-[10px] font-black text-green-600 bg-green-50 px-4 py-2 rounded-xl border-2 border-green-200">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  GIFTLY NODES ONLINE
+                  HIGC NODES ONLINE
                 </div>
                 <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-center italic">
-                  © 2026 GIFTLY TECHNOLOGIES • RC: 1029384
+                  © 2026 HIGC TECHNOLOGIES • RC: 1029384
                 </div>
               </div>
 

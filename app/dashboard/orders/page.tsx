@@ -1,5 +1,6 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   Search, 
   Filter, 
@@ -7,23 +8,58 @@ import {
   Clock, 
   CheckCircle2, 
   XCircle,
-  ArrowDownLeft,
-  ArrowUpRight
+  Package
 } from "lucide-react";
-
-const ORDERS = [
-  { id: "TRX-9902", asset: "Amazon Card", amount: "₦450,000", date: "Jan 09, 14:20", status: "Completed", type: "Sell" },
-  { id: "TRX-9841", asset: "Steam Wallet", amount: "₦12,500", date: "Jan 09, 09:15", status: "Pending", type: "Sell" },
-  { id: "TRX-9810", asset: "Apple Store", amount: "₦85,000", date: "Jan 08, 22:45", status: "Rejected", type: "Sell" },
-  { id: "TRX-9755", asset: "Google Play", amount: "₦200,000", date: "Jan 08, 11:30", status: "Completed", type: "Sell" },
-  { id: "TRX-9701", asset: "Bank Transfer", amount: "₦100,000", date: "Jan 07, 18:10", status: "Completed", type: "Withdraw" },
-];
+import { ordersAPI } from '@/lib/api';
+import { useAuthStore } from '@/store/authStore';
+import Link from 'next/link';
+import { formatIQDShort } from '@/lib/currency';
 
 export default function OrdersPage() {
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login?redirect=/dashboard/orders');
+      return;
+    }
+    loadOrders();
+  }, [isAuthenticated, router]);
+
+  const loadOrders = async () => {
+    try {
+      const response = await ordersAPI.list();
+      setOrders(response.data.results || response.data || []);
+    } catch (error) {
+      console.error('Failed to load orders:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredOrders = orders.filter((order: any) =>
+    order.id.toString().includes(searchTerm) ||
+    order.status?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-6 animate-pulse">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-32 bg-gray-100 rounded-[24px]" />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700 px-4 md:px-0 pb-20">
       
-      {/* HEADER: DATA MODE */}
+      {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -41,6 +77,8 @@ export default function OrdersPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 group-focus-within:text-black transition-colors" />
             <input 
               type="text" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="SEARCH ID..." 
               className="bg-gray-50 border border-gray-100 py-3 pl-11 pr-4 rounded-xl text-[10px] font-bold tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:bg-white transition-all w-full md:w-64"
             />
@@ -51,115 +89,113 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {/* --- DESKTOP TABLE VIEW (Hidden on Mobile) --- */}
+      {/* DESKTOP TABLE VIEW */}
       <div className="hidden md:block bg-white border border-gray-100 rounded-[32px] overflow-hidden shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-gray-50">
-              <th className="px-8 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">ID / Timestamp</th>
-              <th className="px-8 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">Asset Type</th>
-              <th className="px-8 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">Value</th>
+              <th className="px-8 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">Order ID</th>
+              <th className="px-8 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">Date</th>
+              <th className="px-8 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">Items</th>
+              <th className="px-8 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">Total</th>
               <th className="px-8 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 text-center">Status</th>
-              <th className="px-8 py-6 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 text-right">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {ORDERS.map((order) => (
+            {filteredOrders.map((order: any) => (
               <tr key={order.id} className="group hover:bg-gray-50/50 transition-colors cursor-pointer">
                 <td className="px-8 py-6">
-                  <div className="space-y-1">
-                    <p className="text-[11px] font-black text-gray-900 tracking-wider font-mono uppercase">{order.id}</p>
-                    <p className="text-[9px] font-medium text-gray-400 uppercase tracking-tight">{order.date}</p>
-                  </div>
+                  <p className="text-[11px] font-black text-gray-900 tracking-wider font-mono uppercase">#{order.id}</p>
                 </td>
                 <td className="px-8 py-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-white transition-colors">
-                      {order.type === 'Sell' ? <ArrowDownLeft size={14} className="text-blue-600" /> : <ArrowUpRight size={14} className="text-gray-400" />}
-                    </div>
-                    <span className="text-[11px] font-black uppercase tracking-widest text-gray-800">{order.asset}</span>
-                  </div>
+                  <p className="text-[9px] font-medium text-gray-400 uppercase tracking-tight">
+                    {new Date(order.created_at).toLocaleDateString()}
+                  </p>
                 </td>
                 <td className="px-8 py-6">
-                  <p className="text-sm font-black text-gray-900 tabular-nums tracking-tighter">{order.amount}</p>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-gray-800">
+                    {order.items?.length || 0} item(s)
+                  </p>
+                </td>
+                <td className="px-8 py-6">
+                  <p className="text-sm font-black text-gray-900 tabular-nums tracking-tighter">{formatIQDShort(order.total_iqd || '0')} IQD</p>
                 </td>
                 <td className="px-8 py-6 text-center">
-                  <div className="inline-block">
-                    <StatusBadge status={order.status} />
-                  </div>
-                </td>
-                <td className="px-8 py-6 text-right">
-                  <button className="p-2 text-gray-300 hover:text-black hover:bg-gray-100 rounded-lg transition-all">
-                    <ChevronRight size={18} />
-                  </button>
+                  <StatusBadge status={order.status} />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        {filteredOrders.length === 0 && (
+          <div className="p-12 text-center">
+            <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-400 font-black uppercase tracking-widest">No orders found</p>
+          </div>
+        )}
       </div>
 
-      {/* --- MOBILE CARD VIEW (Hidden on Desktop) --- */}
+      {/* MOBILE CARD VIEW */}
       <div className="md:hidden space-y-4">
-        {ORDERS.map((order) => (
-          <div key={order.id} className="bg-white border border-gray-100 p-5 rounded-[24px] space-y-4 shadow-sm active:scale-[0.98] transition-all">
+        {filteredOrders.map((order: any) => (
+          <div key={order.id} className="bg-white border border-gray-100 p-5 rounded-[24px] space-y-4 shadow-sm">
             <div className="flex justify-between items-start">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gray-50 rounded-lg">
-                   {order.type === 'Sell' ? <ArrowDownLeft size={14} className="text-blue-600" /> : <ArrowUpRight size={14} className="text-gray-400" />}
-                </div>
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-widest text-gray-900">{order.asset}</p>
-                  <p className="text-[9px] font-mono font-bold text-gray-400">{order.id}</p>
-                </div>
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-widest text-gray-900">Order #{order.id}</p>
+                <p className="text-[9px] font-mono font-bold text-gray-400 mt-1">
+                  {new Date(order.created_at).toLocaleDateString()}
+                </p>
               </div>
               <StatusBadge status={order.status} />
             </div>
 
             <div className="flex items-end justify-between border-t border-gray-50 pt-4">
               <div>
-                <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Settlement Value</p>
-                <p className="text-xl font-black text-gray-900 tracking-tighter italic">{order.amount}</p>
+                <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Total</p>
+                <p className="text-xl font-black text-gray-900 tracking-tighter italic">{formatIQDShort(order.total_iqd || '0')} IQD</p>
               </div>
               <div className="text-right">
-                <p className="text-[9px] font-bold text-gray-400 uppercase">{order.date}</p>
-                <button className="flex items-center gap-1 text-[9px] font-black text-blue-600 uppercase tracking-tighter mt-1">
-                  Details <ChevronRight size={12} />
-                </button>
+                <p className="text-[9px] font-bold text-gray-400 uppercase">{order.items?.length || 0} item(s)</p>
               </div>
             </div>
           </div>
         ))}
+        {filteredOrders.length === 0 && (
+          <div className="p-12 text-center">
+            <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-400 font-black uppercase tracking-widest">No orders found</p>
+          </div>
+        )}
       </div>
-
-      {/* FOOTER ACTION */}
-      <div className="flex justify-center pt-4">
-        <button className="w-full md:w-auto px-8 py-4 bg-black text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] hover:bg-blue-600 transition-all shadow-xl shadow-blue-500/10 active:scale-95">
-          Sync Database
-        </button>
-      </div>
-
     </div>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    Completed: "bg-green-50 text-green-600 border-green-100",
-    Pending: "bg-orange-50 text-orange-600 border-orange-100",
-    Rejected: "bg-red-50 text-red-600 border-red-100",
+  const statusMap: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
+    completed: {
+      bg: "bg-green-50 text-green-600 border-green-100",
+      text: "Completed",
+      icon: <CheckCircle2 size={10} />
+    },
+    pending: {
+      bg: "bg-orange-50 text-orange-600 border-orange-100",
+      text: "Pending",
+      icon: <Clock size={10} />
+    },
+    cancelled: {
+      bg: "bg-red-50 text-red-600 border-red-100",
+      text: "Cancelled",
+      icon: <XCircle size={10} />
+    },
   };
 
-  const icons: Record<string, React.ReactNode> = {
-    Completed: <CheckCircle2 size={10} />,
-    Pending: <Clock size={10} />,
-    Rejected: <XCircle size={10} />,
-  };
+  const statusInfo = statusMap[status?.toLowerCase()] || statusMap.pending;
 
   return (
-    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[8px] md:text-[9px] font-black uppercase tracking-widest ${styles[status]}`}>
-      {icons[status]}
-      {status}
+    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[8px] md:text-[9px] font-black uppercase tracking-widest ${statusInfo.bg}`}>
+      {statusInfo.icon}
+      {statusInfo.text}
     </div>
   );
 }

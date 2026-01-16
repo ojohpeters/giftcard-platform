@@ -1,11 +1,34 @@
 "use client";
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, Mail, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { useAuthStore } from '@/store/authStore';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const login = useAuthStore((state) => state.login);
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const redirect = searchParams.get('redirect');
+      if (user.is_staff) {
+        router.push('/admin');
+      } else if (redirect) {
+        router.push(redirect);
+      } else {
+        router.push('/dashboard');
+      }
+    }
+  }, [isAuthenticated, user, router, searchParams]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center px-4">
@@ -22,8 +45,42 @@ export default function LoginPage() {
           <p className="text-gray-500 mt-2 text-sm">Log in to manage your assets and payouts</p>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl">
+            <p className="text-xs text-red-600 font-bold">{error}</p>
+          </div>
+        )}
+
         {/* Form */}
-        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-6" onSubmit={async (e) => {
+          e.preventDefault();
+          setError('');
+          setLoading(true);
+          try {
+            await login(email, password);
+            // Wait a moment for user state to update
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // Get redirect from URL params or check user role
+            const redirect = searchParams.get('redirect');
+            const currentUser = useAuthStore.getState().user;
+            
+            // If user is admin, always redirect to admin dashboard
+            if (currentUser?.is_staff) {
+              router.push('/admin');
+            } else if (redirect) {
+              router.push(redirect);
+            } else {
+              router.push('/dashboard');
+            }
+          } catch (err: any) {
+            const errorMsg = err.response?.data?.error || err.response?.data?.detail || 'Login failed. Please check your credentials.';
+            setError(errorMsg);
+          } finally {
+            setLoading(false);
+          }
+        }}>
           
           {/* Email Field */}
           <div className="space-y-2">
@@ -32,7 +89,10 @@ export default function LoginPage() {
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input 
                 type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
+                required
                 className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all text-sm"
               />
             </div>
@@ -42,13 +102,16 @@ export default function LoginPage() {
           <div className="space-y-2">
             <div className="flex justify-between items-center ml-1">
               <label className="text-xs font-bold uppercase tracking-wider text-gray-400">Password</label>
-              <button className="text-xs font-bold text-blue-600 hover:underline">Forgot?</button>
+              <button type="button" className="text-xs font-bold text-blue-600 hover:underline">Forgot?</button>
             </div>
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input 
                 type={showPassword ? "text" : "password"} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
+                required
                 className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-12 pr-12 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all text-sm"
               />
               <button 
@@ -63,10 +126,11 @@ export default function LoginPage() {
 
           {/* Login Button */}
           <button 
-            onClick={() => router.push('/marketplace')}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-100 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-100 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
           >
-            Sign In <ArrowRight size={20} />
+            {loading ? 'Signing in...' : 'Sign In'} <ArrowRight size={20} />
           </button>
         </form>
 

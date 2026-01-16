@@ -1,210 +1,219 @@
 "use client";
-import React, { useState } from 'react';
-import { Check, Edit2, X, AlertCircle, Plus, Save, Trash2, Zap, ArrowUpRight, Filter } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { 
+  ShoppingBag, 
+  Package, 
+  TrendingUp, 
+  Gift,
+  ArrowRight,
+  Copy,
+  CheckCircle2
+} from "lucide-react";
+import { useAuthStore } from '@/store/authStore';
+import { ordersAPI, referralsAPI } from '@/lib/api';
+import Link from 'next/link';
+import { formatIQDShort } from '@/lib/currency';
 
-export default function AdminDashboard() {
-  const [trades, setTrades] = useState([
-    { id: 1, user: "@davido_01", asset: "Amazon $100", value: 148000, status: "VERIFYING" },
-    { id: 2, user: "@wizzy_tech", asset: "Steam $50", value: 65500, status: "PAID" },
-  ]);
+export default function DashboardPage() {
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [referralStats, setReferralStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
-  const [isAdding, setIsAdding] = useState(false);
-  const [newTrade, setNewTrade] = useState({ user: '', asset: '', value: '', status: 'VERIFYING' });
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editValue, setEditValue] = useState(0);
-  const [editStatus, setEditStatus] = useState("");
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login?redirect=/dashboard');
+      return;
+    }
+    loadData();
+  }, [isAuthenticated, router]);
 
-  const handleAddTrade = () => {
-    if (!newTrade.user || !newTrade.value) return;
-    const entry = {
-      id: Date.now(),
-      user: newTrade.user.startsWith('@') ? newTrade.user : `@${newTrade.user}`,
-      asset: newTrade.asset || "Manual Entry",
-      value: Number(newTrade.value),
-      status: newTrade.status
-    };
-    setTrades([entry, ...trades]);
-    setNewTrade({ user: '', asset: '', value: '', status: 'VERIFYING' });
-    setIsAdding(false);
+  const loadData = async () => {
+    try {
+      const [ordersRes, referralsRes] = await Promise.all([
+        ordersAPI.list(),
+        referralsAPI.getStats(),
+      ]);
+      setOrders(ordersRes.data.results || ordersRes.data || []);
+      setReferralStats(referralsRes.data);
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const startEdit = (trade: any) => {
-    setEditingId(trade.id);
-    setEditValue(trade.value);
-    setEditStatus(trade.status);
+  const copyReferralCode = async () => {
+    if (user?.referral_code) {
+      await navigator.clipboard.writeText(user.referral_code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
-  const saveEdit = (id: number) => {
-    setTrades(trades.map(t => t.id === id ? { ...t, value: editValue, status: editStatus } : t));
-    setEditingId(null);
-  };
+  if (!isAuthenticated || loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-pulse text-center">
+          <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4" />
+          <p className="text-gray-400 font-bold uppercase tracking-widest">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const deleteTrade = (id: number) => {
-    if(confirm("Delete this entry?")) setTrades(trades.filter(t => t.id !== id));
-  };
+  const totalOrders = orders.length;
+  const completedOrders = orders.filter((o: any) => o.status === 'completed').length;
+  const totalSpent = orders
+    .filter((o: any) => o.status === 'completed')
+    .reduce((sum: number, o: any) => sum + parseFloat(o.total || '0'), 0);
 
   const stats = [
-    { label: "Volume", value: "4.2M", color: "text-blue-600" },
-    { label: "Pending", value: "18", color: "text-orange-500" },
-    { label: "Active", value: "1.2K", color: "text-green-600" },
+    { 
+      label: "Total Orders", 
+      value: totalOrders.toString(), 
+      icon: ShoppingBag,
+      color: "text-blue-600",
+      bg: "bg-blue-50"
+    },
+    { 
+      label: "Completed", 
+      value: completedOrders.toString(), 
+      icon: CheckCircle2,
+      color: "text-green-600",
+      bg: "bg-green-50"
+    },
+    { 
+      label: "Total Spent", 
+      value: `${formatIQDShort(totalSpent)} IQD`, 
+      icon: TrendingUp,
+      color: "text-purple-600",
+      bg: "bg-purple-50"
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 text-[#0A0A0A] font-sans antialiased pb-32">
+    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700">
       
-      {/* STICKY TOP HEADER */}
-      <div className="sticky top-0 z-[60] bg-white/80 backdrop-blur-md border-b-4 border-black p-4 md:p-8 mb-6 md:mb-12">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl md:text-7xl font-black tracking-tighter uppercase italic leading-none">Node</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 text-left">Control Terminal v4.0</span>
-            </div>
-          </div>
-          <button 
-            onClick={() => setIsAdding(!isAdding)}
-            className="bg-black text-white p-4 md:px-8 md:py-5 rounded-2xl md:rounded-[24px] border-2 md:border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
-          >
-            {isAdding ? <X size={20} /> : <Plus size={20} />}
-          </button>
+      {/* HEADER */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="h-1 w-4 bg-blue-600"></div>
+          <p className="text-[9px] font-black text-blue-600 uppercase tracking-[0.4em]">Dashboard</p>
         </div>
+        <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter italic uppercase leading-none">
+          Welcome<span className="text-gray-200">,</span> {user?.first_name || 'User'}
+        </h1>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-8">
-        
-        {/* MOBILE-OPTIMIZED STATS GRID */}
-        <div className="grid grid-cols-3 gap-3 md:gap-8">
-          {stats.map((stat) => (
-            <div key={stat.label} className="bg-white border-2 md:border-4 border-black p-4 md:p-8 rounded-2xl md:rounded-[40px] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <div className="text-[8px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2">{stat.label}</div>
-              <div className="flex items-baseline gap-0.5">
-                <span className="text-xs md:text-3xl font-black italic">₦</span>
-                <span className="text-xl md:text-6xl font-black tracking-tighter leading-none">{stat.value}</span>
+      {/* STATS GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {stats.map((stat, i) => (
+          <div key={i} className="bg-white border-2 border-black p-6 rounded-[32px] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`${stat.bg} p-3 rounded-2xl`}>
+                <stat.icon className={`${stat.color} w-6 h-6`} />
+              </div>
+            </div>
+            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">{stat.label}</p>
+            <p className="text-3xl font-black tracking-tighter leading-none">{stat.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* RECENT ORDERS */}
+      <div className="bg-white border-4 border-black rounded-[32px] overflow-hidden shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]">
+        <div className="p-6 md:p-8 border-b-4 border-black bg-gray-50 flex justify-between items-center">
+          <h2 className="font-black uppercase italic text-lg md:text-2xl">Recent Orders</h2>
+          <Link href="/dashboard/orders" className="text-blue-600 hover:text-blue-700 font-black uppercase text-xs tracking-widest flex items-center gap-2">
+            View All <ArrowRight size={14} />
+          </Link>
+        </div>
+        <div className="divide-y-2 divide-black">
+          {orders.slice(0, 5).map((order: any) => (
+            <div key={order.id} className="p-5 md:p-8 group transition-colors hover:bg-gray-50">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-black text-white flex items-center justify-center rounded-2xl font-black italic">
+                    #{order.id}
+                  </div>
+                  <div>
+                    <p className="font-black italic text-lg md:text-xl leading-none">Order #{order.id}</p>
+                    <p className="text-[9px] font-black text-gray-400 uppercase mt-1 tracking-widest">
+                      {new Date(order.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-6">
+                  <div className="text-right">
+                    <p className="text-[8px] font-black uppercase text-gray-400 mb-1">Total</p>
+                    <p className="font-black text-xl md:text-2xl italic">{formatIQDShort(order.total_iqd || '0')} IQD</p>
+                  </div>
+                  <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] ${
+                    order.status === 'completed' ? 'bg-green-400' : 
+                    order.status === 'pending' ? 'bg-orange-400' : 
+                    'bg-red-400'
+                  }`}>
+                    {order.status?.toUpperCase() || 'PENDING'}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
-        </div>
-
-        {/* ADD FORM - FULL WIDTH MOBILE */}
-        {isAdding && (
-          <div className="bg-white border-4 border-black p-6 md:p-10 rounded-[32px] md:rounded-[40px] shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-200">
-            <h2 className="text-xl font-black uppercase italic mb-6 flex items-center gap-2">
-              <Zap className="text-blue-600" size={20} /> Manual Entry
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <input 
-                placeholder="Username" 
-                className="bg-gray-50 border-2 md:border-4 border-black p-4 md:p-5 rounded-xl font-black outline-none focus:bg-blue-50"
-                value={newTrade.user}
-                onChange={(e) => setNewTrade({...newTrade, user: e.target.value})}
-              />
-              <input 
-                placeholder="Asset" 
-                className="bg-gray-50 border-2 md:border-4 border-black p-4 md:p-5 rounded-xl font-black outline-none focus:bg-blue-50"
-                value={newTrade.asset}
-                onChange={(e) => setNewTrade({...newTrade, asset: e.target.value})}
-              />
-              <input 
-                type="number"
-                placeholder="Naira Value" 
-                className="bg-gray-50 border-2 md:border-4 border-black p-4 md:p-5 rounded-xl font-black outline-none focus:bg-blue-50"
-                value={newTrade.value}
-                onChange={(e) => setNewTrade({...newTrade, value: e.target.value})}
-              />
-              <button 
-                onClick={handleAddTrade}
-                className="bg-blue-600 text-white p-4 md:p-5 border-2 md:border-4 border-black rounded-xl font-black uppercase text-xs shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none"
-              >
-                Deploy
-              </button>
+          {orders.length === 0 && (
+            <div className="p-12 text-center">
+              <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-400 font-black uppercase tracking-widest">No orders yet</p>
+              <Link href="/marketplace" className="text-blue-600 hover:underline mt-2 inline-block">
+                Start Shopping
+              </Link>
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* REFERRAL SECTION */}
+      {referralStats && (
+        <div className="bg-white border-4 border-black rounded-[32px] p-6 md:p-10 shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]">
+          <div className="flex items-center gap-3 mb-6">
+            <Gift className="text-blue-600 w-6 h-6" />
+            <h2 className="font-black uppercase italic text-xl md:text-2xl">Referral Program</h2>
           </div>
-        )}
-
-        {/* DATA LISTING */}
-        <div className="bg-white border-4 border-black rounded-[32px] md:rounded-[40px] overflow-hidden shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]">
-          <div className="p-6 md:p-8 border-b-4 border-black bg-gray-50 flex justify-between items-center">
-            <h2 className="font-black uppercase italic text-lg md:text-2xl">Manifest</h2>
-            <Filter size={20} />
-          </div>
-
-          <div className="divide-y-2 md:divide-y-4 divide-black">
-            {trades.map((trade) => (
-              <div key={trade.id} className="p-5 md:p-10 group transition-colors hover:bg-gray-50">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  
-                  {/* USER INFO */}
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 md:w-16 md:h-16 bg-black text-white flex items-center justify-center rounded-2xl font-black italic text-xl">
-                      {trade.user.substring(1,2).toUpperCase()}
-                    </div>
-                    <div className="text-left">
-                      <div className="font-black italic text-xl md:text-3xl leading-none">{trade.user}</div>
-                      <div className="text-[9px] md:text-xs font-black text-gray-400 uppercase mt-1 tracking-widest">{trade.asset}</div>
-                    </div>
-                  </div>
-
-                  {/* VALUE & STATUS */}
-                  <div className="flex items-center justify-between md:justify-end gap-4 md:gap-12">
-                    <div className="text-left md:text-right">
-                      <div className="text-[8px] font-black uppercase text-gray-400 mb-1">Settlement</div>
-                      {editingId === trade.id ? (
-                        <input type="number" value={editValue} onChange={(e) => setEditValue(Number(e.target.value))} className="border-2 border-black rounded-lg px-2 py-1 w-24 font-black bg-blue-50" />
-                      ) : (
-                        <div className="font-black text-xl md:text-4xl italic">₦{trade.value.toLocaleString()}</div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      {editingId === trade.id ? (
-                        <select value={editStatus} onChange={(e) => setEditStatus(e.target.value)} className="border-2 border-black rounded-lg p-2 font-black text-[10px] uppercase bg-white">
-                          <option value="VERIFYING">VERIFYING</option>
-                          <option value="PAID">PAID</option>
-                          <option value="CANCELLED">CANCELLED</option>
-                        </select>
-                      ) : (
-                        <span className={`px-4 py-2 rounded-xl text-[8px] md:text-[10px] font-black uppercase border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] ${
-                          trade.status === 'PAID' ? 'bg-green-400' : trade.status === 'CANCELLED' ? 'bg-red-400' : 'bg-orange-400'
-                        }`}>
-                          {trade.status}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* ACTIONS */}
-                  <div className="flex justify-end gap-2 border-t-2 border-black pt-4 md:pt-0 md:border-0">
-                    {editingId === trade.id ? (
-                      <button onClick={() => saveEdit(trade.id)} className="flex-1 md:flex-none bg-black text-white p-4 rounded-xl border-2 border-black"><Save size={18}/></button>
-                    ) : (
-                      <>
-                        <button onClick={() => startEdit(trade)} className="flex-1 md:flex-none p-4 border-2 border-black rounded-xl hover:bg-black hover:text-white transition-all"><Edit2 size={18}/></button>
-                        <button onClick={() => deleteTrade(trade.id)} className="flex-1 md:flex-none p-4 border-2 border-black rounded-xl text-red-600 hover:bg-red-50"><Trash2 size={18}/></button>
-                      </>
-                    )}
-                  </div>
-
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Your Referral Code</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 bg-gray-50 border-2 border-black p-4 rounded-2xl font-black text-lg tracking-widest">
+                  {user?.referral_code || 'N/A'}
+                </div>
+                <button
+                  onClick={copyReferralCode}
+                  className="p-4 bg-black text-white rounded-2xl hover:bg-blue-600 transition-all"
+                >
+                  {copied ? <CheckCircle2 size={20} /> : <Copy size={20} />}
+                </button>
+              </div>
+            </div>
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Referral Stats</p>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-bold text-gray-600">Total Referrals</span>
+                  <span className="text-2xl font-black">{referralStats.total_referrals || 0}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-bold text-gray-600">Total Earnings</span>
+                  <span className="text-2xl font-black text-green-600">{formatIQDShort(referralStats.total_earnings || '0')} IQD</span>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* MOBILE FAB - ALWAYS ACCESSIBLE */}
-      <div className="md:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-[90%]">
-        <button 
-          onClick={() => setIsAdding(!isAdding)}
-          className={`w-full p-5 rounded-[24px] border-4 border-black font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all ${
-            isAdding ? 'bg-red-500 text-white' : 'bg-blue-600 text-white'
-          }`}
-        >
-          {isAdding ? <X size={20} /> : <Plus size={20} />}
-          {isAdding ? "Close Panel" : "Quick Entry"}
-        </button>
-      </div>
-
+      )}
     </div>
   );
 }

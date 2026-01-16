@@ -11,8 +11,9 @@ import {
   CheckCircle2,
   Lock
 } from "lucide-react";
+import { formatIQDShort } from '@/lib/currency';
 
-export default function GiftlyProPage() {
+export default function HiGcPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [selectedAsset, setSelectedAsset] = useState("");
@@ -42,29 +43,29 @@ export default function GiftlyProPage() {
             </div>
             
             <h1 className="text-[38px] sm:text-6xl md:text-[84px] font-black tracking-[-0.04em] leading-[0.95] md:leading-[0.88] uppercase">
-              Liquidity <br />
-              <span className="text-gray-300 italic font-light tracking-tight lowercase font-serif pr-2">without</span> 
-              friction.
+              Gift Cards <br />
+              <span className="text-gray-300 italic font-light tracking-tight lowercase font-serif pr-2">for</span> 
+              Everyone.
             </h1>
 
             <p className="max-w-lg text-sm md:text-lg text-gray-500 leading-relaxed font-medium">
-              The high-performance exchange layer for digital assets. 
-              Converting global retail cards into institutional-grade NGN liquidity.
+              Premium digital gift cards from top brands. 
+              Instant delivery, secure transactions, and the best rates in Iraq.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <button 
-                onClick={() => handleStartTrade()}
+              <a 
+                href="/marketplace"
                 className="h-12 md:h-14 px-8 bg-black text-white rounded-full font-bold uppercase text-[10px] md:text-[11px] tracking-widest flex items-center justify-center gap-4 hover:bg-blue-600 transition-all shadow-xl shadow-gray-200 group"
               >
-                Execute Trade <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button 
-                onClick={scrollToExchange}
+                Shop Gift Cards <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </a>
+              <a 
+                href="/marketplace"
                 className="h-12 md:h-14 px-8 bg-white border border-gray-100 text-gray-400 rounded-full font-bold uppercase text-[10px] md:text-[11px] tracking-widest flex items-center justify-center hover:border-black hover:text-black transition-all"
               >
-                View Live Rates
-              </button>
+                Browse Catalog
+              </a>
             </div>
           </div>
 
@@ -92,50 +93,50 @@ export default function GiftlyProPage() {
       <section id="exchange-index" className="px-5 py-20 md:py-28 max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-16 gap-4">
           <div className="space-y-2">
-            <h2 className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.5em] text-blue-600 font-sans">Index</h2>
-            <h3 className="text-3xl md:text-4xl font-black tracking-tighter italic">Live Yields.</h3>
+            <h2 className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.5em] text-blue-600 font-sans">Featured</h2>
+            <h3 className="text-3xl md:text-4xl font-black tracking-tighter italic">Popular Cards.</h3>
           </div>
           <div className="hidden md:flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
             <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-            Live Market Feed
+            Instant Delivery Available
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {[
-            { name: "Amazon US Receipt", rate: "1,550" },
-            { name: "Steam Global", rate: "1,240" },
-            { name: "Apple / iTunes", rate: "1,100" },
-            { name: "Razer Gold Global", rate: "1,450" },
-            { name: "Sephora / Nord", rate: "1,320" },
-            { name: "Google Play US", rate: "1,050" },
-          ].map((asset, i) => (
-            <div 
-              key={i} 
-              onClick={() => handleStartTrade(asset.name)}
+            { name: "Amazon", rate: "1,550", icon: "🛒" },
+            { name: "Steam", rate: "1,240", icon: "🎮" },
+            { name: "Apple iTunes", rate: "1,100", icon: "🍎" },
+            { name: "PlayStation", rate: "1,450", icon: "🎮" },
+            { name: "Netflix", rate: "1,320", icon: "📺" },
+            { name: "Google Play", rate: "1,050", icon: "📱" },
+          ].map((card, i) => (
+            <a
+              key={i}
+              href="/marketplace"
               className="group bg-white p-8 md:p-10 rounded-[32px] border border-gray-100 hover:border-blue-600/20 hover:shadow-2xl hover:shadow-blue-900/5 transition-all cursor-pointer relative overflow-hidden"
             >
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="flex justify-between items-start mb-12 relative z-10">
                 <div className="flex flex-col gap-1">
                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 group-hover:text-blue-600 transition-colors">
-                    {asset.name}
+                    {card.name}
                   </p>
-                  <span className="text-[10px] text-gray-300 font-mono">ID: 00{i+1}</span>
+                  <span className="text-3xl">{card.icon}</span>
                 </div>
                 <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
                   <ArrowUpRight size={18} strokeWidth={2.5} />
                 </div>
               </div>
               <div className="flex items-baseline gap-2 relative z-10">
-                <span className="text-4xl md:text-5xl font-black tracking-tighter">₦{asset.rate}</span>
+                <span className="text-4xl md:text-5xl font-black tracking-tighter">{formatIQDShort(card.rate)} IQD</span>
                 <span className="text-[10px] font-black text-gray-300 uppercase italic">/$</span>
               </div>
               <div className="mt-8 pt-6 border-t border-gray-50 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
-                <span className="text-[9px] font-black uppercase tracking-widest text-blue-600">Sell Now</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-blue-600">Shop Now</span>
                 <Zap size={12} className="text-blue-600 fill-blue-600" />
               </div>
-            </div>
+            </a>
           ))}
         </div>
 
@@ -144,7 +145,7 @@ export default function GiftlyProPage() {
           <div className="flex gap-12 animate-infinite-scroll whitespace-nowrap">
             {[1,2,3,4,5].map((idx) => (
               <div key={idx} className="flex items-center gap-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                <span className="text-blue-600">●</span> User_8{idx}x settled ₦240,000 via Steam Card
+                <span className="text-blue-600">●</span> User_8{idx}x settled {formatIQDShort(240000)} IQD via Steam Card
                 <span className="text-gray-200">|</span>
                 <span className="text-green-500">●</span> 0.4ms Execution for Amazon US
               </div>
@@ -158,18 +159,18 @@ export default function GiftlyProPage() {
         <div className="bg-[#0A0A0B] rounded-[48px] p-8 md:p-20 text-center space-y-8 relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600 rounded-full blur-[120px] opacity-10 pointer-events-none" />
           <h2 className="text-3xl md:text-6xl font-black text-white tracking-tighter leading-none relative z-10">
-            READY TO <br /> <span className="text-blue-500 italic font-serif lowercase font-light">liquidate?</span>
+            READY TO <br /> <span className="text-blue-500 italic font-serif lowercase font-light">shop?</span>
           </h2>
           <p className="text-gray-400 max-w-md mx-auto text-sm md:text-base relative z-10 font-medium">
-            Join the elite network of traders using Giftly’s high-speed engine for all asset settlements.
+            Browse our collection of premium gift cards from the world's top brands. Instant delivery guaranteed.
           </p>
           <div className="flex justify-center relative z-10 pt-4">
-            <button 
-              onClick={() => handleStartTrade()}
+            <a 
+              href="/marketplace"
               className="h-14 px-10 bg-blue-600 text-white rounded-full font-bold uppercase text-[11px] tracking-[0.2em] flex items-center gap-4 hover:bg-white hover:text-black transition-all"
             >
-              Start Liquidation <MessageSquare size={16} />
-            </button>
+              Browse Catalog <MessageSquare size={16} />
+            </a>
           </div>
         </div>
       </section>
@@ -219,7 +220,7 @@ export default function GiftlyProPage() {
                       placeholder="$0.00" 
                       className="w-full text-4xl font-black tracking-tighter outline-none placeholder:text-gray-100" 
                     />
-                    <p className="text-sm font-bold text-gray-400">You will receive approx: <span className="text-black font-black">₦0.00</span></p>
+                    <p className="text-sm font-bold text-gray-400">You will receive approx: <span className="text-black font-black">{formatIQDShort(0)} IQD</span></p>
                   </div>
 
                   <button 

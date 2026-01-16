@@ -1,13 +1,26 @@
+"use client";
+import { useRouter } from 'next/navigation';
 import { 
   LayoutGrid, 
   History, 
   ArrowUpRight, 
   Settings, 
   LogOut, 
-  Wallet 
+  Wallet,
+  MessageSquare
 } from "lucide-react";
+import { useAuthStore } from '@/store/authStore';
+import Link from 'next/link';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
+  const user = useAuthStore((state) => state.user);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/');
+  };
   return (
     <div className="flex min-h-screen bg-white font-sans selection:bg-blue-50">
       
@@ -29,6 +42,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <a href="/dashboard/orders" className="flex items-center gap-4 px-3 py-2 text-sm font-bold text-gray-400 hover:text-gray-900 transition-all group">
                 <History size={18} className="group-hover:text-gray-900" />
                 History
+              </a>
+              <a href="/dashboard/support" className="flex items-center gap-4 px-3 py-2 text-sm font-bold text-gray-400 hover:text-gray-900 transition-all group">
+                <MessageSquare size={18} className="group-hover:text-gray-900" />
+                Support
               </a>
             </div>
           </div>
@@ -57,11 +74,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Balance</p>
             </div>
             <p className="text-xl font-black text-gray-900 tracking-tighter">
-              ₦124,500<span className="text-gray-300">.00</span>
+              ₦0<span className="text-gray-300">.00</span>
+            </p>
+            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+              {user?.email}
             </p>
           </div>
           
-          <button className="flex items-center gap-4 px-3 py-2 text-sm font-bold text-gray-400 hover:text-red-600 transition-all w-full">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-4 px-3 py-2 text-sm font-bold text-gray-400 hover:text-red-600 transition-all w-full"
+          >
             <LogOut size={18} />
             Logout
           </button>

@@ -69,14 +69,14 @@ export default function RatesPage() {
             />
             <input 
               type="number" 
-              placeholder="Buy Rate (₦)" 
+              placeholder="Buy Rate (IQD)" 
               className="border-2 border-black p-4 rounded-2xl font-black outline-none bg-gray-50"
               value={newRate.buy}
               onChange={(e) => setNewRate({...newRate, buy: e.target.value})}
             />
             <input 
               type="number" 
-              placeholder="Sell Rate (₦)" 
+              placeholder="Sell Rate (IQD)" 
               className="border-2 border-black p-4 rounded-2xl font-black outline-none bg-gray-50"
               value={newRate.sell}
               onChange={(e) => setNewRate({...newRate, sell: e.target.value})}
@@ -97,8 +97,8 @@ export default function RatesPage() {
           <thead>
             <tr className="border-b-2 border-black text-[10px] font-black uppercase tracking-[0.3em] bg-gray-50 text-gray-400">
               <th className="p-8">Asset/Currency</th>
-              <th className="p-8">Our Buy (₦)</th>
-              <th className="p-8">Our Sell (₦)</th>
+              <th className="p-8">Our Buy (IQD)</th>
+              <th className="p-8">Our Sell (IQD)</th>
               <th className="p-8">System Status</th>
               <th className="p-8 text-right">Settings</th>
             </tr>
@@ -110,10 +110,10 @@ export default function RatesPage() {
                   {rate.currency} <span className="text-blue-600">/</span> {rate.type}
                 </td>
                 <td className="p-8">
-                  <span className="font-black text-xl tabular-nums italic text-green-600">₦{rate.buy.toLocaleString()}</span>
+                  <span className="font-black text-xl tabular-nums italic text-green-600">{formatIQDShort(rate.buy)} IQD</span>
                 </td>
                 <td className="p-8">
-                  <span className="font-black text-xl tabular-nums italic text-blue-600">₦{rate.sell.toLocaleString()}</span>
+                  <span className="font-black text-xl tabular-nums italic text-blue-600">{formatIQDShort(rate.sell)} IQD</span>
                 </td>
                 <td className="p-8">
                   <button 

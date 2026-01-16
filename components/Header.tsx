@@ -3,10 +3,17 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, Zap, ArrowUpRight, Globe, LayoutDashboard, ShoppingCart, Shield, Home } from "lucide-react";
+import { useAuthStore } from '@/store/authStore';
+import { useCartStore } from '@/store/cartStore';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const cartCount = useCartStore((state) => state.getCartCount());
+  const fetchCart = useCartStore((state) => state.fetchCart);
 
   useEffect(() => {
     if (isOpen) {
@@ -16,11 +23,16 @@ export default function Header() {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCart();
+    }
+  }, [isAuthenticated, fetchCart]);
+
   const mainLinks = [
     { name: "Home", href: "/" },
     { name: "Market", href: "/marketplace" },
-    { name: "Admin", href: "/admin" },
-    { name: "Manifest", href: "/cart" },
+    ...(isAuthenticated ? [{ name: "Manifest", href: "/cart" }] : []),
   ];
 
   const dashboardLinks = [
@@ -41,7 +53,7 @@ export default function Header() {
               <Zap size={22} fill="currentColor" />
             </div>
             <div className="flex items-baseline gap-0.5">
-              <span className="text-2xl md:text-3xl font-black uppercase tracking-tighter italic leading-none text-black">Giftly</span>
+              <span className="text-2xl md:text-3xl font-black uppercase tracking-tighter italic leading-none text-black">HiGc</span>
               <span className="text-blue-600 font-black text-3xl leading-none">.</span>
             </div>
           </Link>
@@ -59,10 +71,36 @@ export default function Header() {
                 {link.name}
               </Link>
             ))}
-            <div className="h-8 w-[3px] bg-black mx-2 opacity-10" />
-            <Link href="/dashboard" className="flex items-center gap-2 bg-black text-white px-6 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-black hover:bg-blue-600 hover:border-blue-600 transition-all shadow-[5px_5px_0px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-1 active:translate-y-1">
-              <LayoutDashboard size={14} strokeWidth={3} /> Dashboard
-            </Link>
+            {isAuthenticated && (
+              <>
+                <div className="h-8 w-[3px] bg-black mx-2 opacity-10" />
+                <Link href="/cart" className="relative flex items-center gap-2 bg-black text-white px-6 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-black hover:bg-blue-600 hover:border-blue-600 transition-all shadow-[5px_5px_0px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-1 active:translate-y-1">
+                  <ShoppingCart size={14} strokeWidth={3} /> 
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[8px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-black">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+                {user?.is_staff ? (
+                  <Link href="/admin" className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-blue-600 hover:bg-black hover:border-black transition-all shadow-[5px_5px_0px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-1 active:translate-y-1">
+                    <Shield size={14} strokeWidth={3} /> Admin
+                  </Link>
+                ) : (
+                  <Link href="/dashboard" className="flex items-center gap-2 bg-black text-white px-6 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-black hover:bg-blue-600 hover:border-blue-600 transition-all shadow-[5px_5px_0px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-1 active:translate-y-1">
+                    <LayoutDashboard size={14} strokeWidth={3} /> Dashboard
+                  </Link>
+                )}
+              </>
+            )}
+            {!isAuthenticated && (
+              <>
+                <div className="h-8 w-[3px] bg-black mx-2 opacity-10" />
+                <Link href="/login" className="flex items-center gap-2 bg-black text-white px-6 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-black hover:bg-blue-600 hover:border-blue-600 transition-all shadow-[5px_5px_0px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-1 active:translate-y-1">
+                  Login
+                </Link>
+              </>
+            )}
           </div>
 
           {/* MOBILE TOGGLE */}
@@ -136,7 +174,13 @@ export default function Header() {
         </div>
 
         <div className="fixed bottom-0 left-0 w-full p-8 bg-white border-t-4 border-black">
-           <button className="w-full bg-red-500 text-white py-6 rounded-[24px] border-4 border-black font-black uppercase text-sm tracking-widest shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all">
+           <button 
+             onClick={async () => {
+               await logout();
+               setIsOpen(false);
+             }}
+             className="w-full bg-red-500 text-white py-6 rounded-[24px] border-4 border-black font-black uppercase text-sm tracking-widest shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
+           >
              Terminate Session
            </button>
         </div>

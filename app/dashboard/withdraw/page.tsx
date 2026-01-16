@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { formatIQDShort } from '@/lib/currency';
 import { ArrowLeft, ShieldCheck, Banknote, Lock, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
@@ -33,14 +34,14 @@ export default function WithdrawPage() {
           {/* BALANCE INFO */}
           <div className="space-y-0.5">
             <p className="text-[8px] font-black text-blue-500 uppercase tracking-[0.3em]">Available</p>
-            <p className="text-xl md:text-3xl font-black text-white tabular-nums tracking-tighter">₦124,500.00</p>
+            <p className="text-xl md:text-3xl font-black text-white tabular-nums tracking-tighter">{formatIQDShort(124500)} IQD</p>
           </div>
 
           {/* INPUT AREA - Scaled for Small Screens */}
           <div className="space-y-2">
             <label className="text-[8px] md:text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Amount</label>
             <div className="relative flex items-center border-b border-white/10 focus-within:border-blue-600 transition-colors pb-2">
-              <span className="text-xl md:text-4xl font-bold text-gray-600 mr-2">₦</span>
+              <span className="text-xl md:text-4xl font-bold text-gray-600 mr-2">IQD</span>
               <input 
                 type="number" 
                 value={amount}
@@ -72,7 +73,7 @@ export default function WithdrawPage() {
       <div className="px-4 md:px-0 space-y-2">
         <h3 className="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-[0.3em]">History</h3>
         <div className="bg-white border border-gray-100 rounded-xl p-3 flex justify-between items-center">
-          <span className="text-[10px] font-black uppercase tabular-nums">₦45,000.00</span>
+          <span className="text-[10px] font-black uppercase tabular-nums">{formatIQDShort(45000)} IQD</span>
           <span className="text-[8px] font-bold text-gray-400 uppercase">Jan 07</span>
         </div>
       </div>
