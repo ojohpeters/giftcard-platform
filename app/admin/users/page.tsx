@@ -25,6 +25,10 @@ export default function AdminUsersPage() {
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [page, setPage] = useState(1);
+  const [count, setCount] = useState(0);
+  const PAGE_SIZE = 50;
+  const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
 
   useEffect(() => {
     if (!user?.is_staff) {
@@ -32,7 +36,8 @@ export default function AdminUsersPage() {
       return;
     }
     loadUsers();
-  }, [user, router, roleFilter, statusFilter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, router, roleFilter, statusFilter, page]);
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -49,13 +54,15 @@ export default function AdminUsersPage() {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const params: any = {};
+      const params: any = { page };
       if (roleFilter !== 'all') params.role = roleFilter;
       if (statusFilter !== 'all') params.status = statusFilter;
       if (searchTerm) params.search = searchTerm;
-      
+
       const response = await adminAPI.getAllUsers(params);
-      setUsers(response.data.results || response.data || []);
+      const results = response.data.results || response.data || [];
+      setUsers(results);
+      setCount(typeof response.data.count === 'number' ? response.data.count : results.length);
     } catch (error: any) {
       console.error('Failed to load users:', error);
       if (error.response?.status === 400) {
@@ -106,7 +113,7 @@ export default function AdminUsersPage() {
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
             Users<span className="text-blue-600">.</span>
           </h1>
-          <p className="text-[10px] md:text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-[0.4em] mt-2">
+          <p className="text-[11px] md:text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-[0.4em] mt-2">
             Manage User Accounts
           </p>
         </div>
@@ -156,7 +163,7 @@ export default function AdminUsersPage() {
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
             placeholder="Search users by email or name..."
             className="w-full bg-white dark:bg-neutral-800 border-2 border-gray-200 dark:border-neutral-700 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-blue-600 text-sm dark:text-neutral-100"
           />
@@ -165,7 +172,7 @@ export default function AdminUsersPage() {
           <Filter size={18} className="text-gray-400 dark:text-neutral-500" />
           <select
             value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
+            onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
             className="bg-white dark:bg-neutral-800 border-2 border-gray-200 dark:border-neutral-700 rounded-2xl py-4 px-4 outline-none focus:border-blue-600 text-sm font-bold uppercase text-xs dark:text-neutral-100"
           >
             <option value="all">All Roles</option>
@@ -174,7 +181,7 @@ export default function AdminUsersPage() {
           </select>
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
             className="bg-white dark:bg-neutral-800 border-2 border-gray-200 dark:border-neutral-700 rounded-2xl py-4 px-4 outline-none focus:border-blue-600 text-sm font-bold uppercase text-xs dark:text-neutral-100"
           >
             <option value="all">All Status</option>
@@ -190,7 +197,7 @@ export default function AdminUsersPage() {
           <table className="w-full min-w-[680px]">
             <thead className="bg-gray-50 dark:bg-neutral-800 border-b-2 border-gray-200 dark:border-neutral-700">
               <tr>
-                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">
+                <th className="text-left px-4 py-4 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">
                   <input
                     type="checkbox"
                     checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
@@ -204,12 +211,12 @@ export default function AdminUsersPage() {
                     className="w-5 h-5 rounded border-gray-300 dark:border-neutral-600 text-blue-600 focus:ring-blue-500"
                   />
                 </th>
-                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">User</th>
-                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Status</th>
-                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Role</th>
-                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Joined</th>
-                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Last Login</th>
-                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Actions</th>
+                <th className="text-left px-4 py-4 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">User</th>
+                <th className="text-left px-4 py-4 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Status</th>
+                <th className="text-left px-4 py-4 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Role</th>
+                <th className="text-left px-4 py-4 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Joined</th>
+                <th className="text-left px-4 py-4 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Last Login</th>
+                <th className="text-left px-4 py-4 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -218,7 +225,7 @@ export default function AdminUsersPage() {
                   <td colSpan={7} className="p-12 text-center">
                     <Users className="w-16 h-16 text-gray-300 dark:text-neutral-600 mx-auto mb-4" />
                     <p className="text-gray-400 dark:text-neutral-500 font-bold uppercase">No users found</p>
-                    <p className="text-[9px] text-gray-400 dark:text-neutral-500 mt-2">User management endpoint needs to be implemented</p>
+                    <p className="text-[11px] text-gray-400 dark:text-neutral-500 mt-2">User management endpoint needs to be implemented</p>
                   </td>
                 </tr>
               ) : (
@@ -246,24 +253,24 @@ export default function AdminUsersPage() {
                         <div className="min-w-0">
                           <p className="text-sm font-black truncate">{user.first_name} {user.last_name}</p>
                           <p className="text-xs text-gray-500 dark:text-neutral-400 truncate">{user.email}</p>
-                          <p className="text-[9px] text-gray-400 dark:text-neutral-500">ID: {user.id}</p>
+                          <p className="text-[11px] text-gray-400 dark:text-neutral-500">ID: {user.id}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         {user.email_verified ? (
-                          <span className="text-[9px] font-black px-2 py-1 rounded-full bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-300 border border-green-200 dark:border-green-900 flex items-center gap-1">
+                          <span className="text-[11px] font-black px-2 py-1 rounded-full bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-300 border border-green-200 dark:border-green-900 flex items-center gap-1">
                             <UserCheck size={12} />
                             Verified
                           </span>
                         ) : (
-                          <span className="text-[9px] font-black px-2 py-1 rounded-full bg-yellow-50 dark:bg-yellow-950/40 text-yellow-600 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-900">
+                          <span className="text-[11px] font-black px-2 py-1 rounded-full bg-yellow-50 dark:bg-yellow-950/40 text-yellow-600 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-900">
                             Unverified
                           </span>
                         )}
                         {!user.is_active && (
-                          <span className="text-[9px] font-black px-2 py-1 rounded-full bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-900 flex items-center gap-1">
+                          <span className="text-[11px] font-black px-2 py-1 rounded-full bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-900 flex items-center gap-1">
                             <UserX size={12} />
                             Inactive
                           </span>
@@ -272,12 +279,12 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-4 py-4">
                       {user.is_staff ? (
-                        <span className="text-[9px] font-black px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-900 flex items-center gap-1 w-fit">
+                        <span className="text-[11px] font-black px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-900 flex items-center gap-1 w-fit">
                           <Shield size={12} />
                           Admin
                         </span>
                       ) : (
-                        <span className="text-[9px] font-black px-2 py-1 rounded-full bg-gray-50 dark:bg-neutral-800 text-gray-600 dark:text-neutral-300 border border-gray-200 dark:border-neutral-700">
+                        <span className="text-[11px] font-black px-2 py-1 rounded-full bg-gray-50 dark:bg-neutral-800 text-gray-600 dark:text-neutral-300 border border-gray-200 dark:border-neutral-700">
                           User
                         </span>
                       )}
@@ -285,24 +292,24 @@ export default function AdminUsersPage() {
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         <Calendar size={14} className="text-gray-400 dark:text-neutral-500" />
-                        <span className="text-[9px] text-gray-400 dark:text-neutral-500">
+                        <span className="text-[11px] text-gray-400 dark:text-neutral-500">
                           {new Date(user.date_joined).toLocaleDateString()}
                         </span>
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      <span className="text-[9px] text-gray-400 dark:text-neutral-500">
+                      <span className="text-[11px] text-gray-400 dark:text-neutral-500">
                         {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}
                       </span>
                     </td>
                     <td className="px-4 py-4">
                       {user.is_staff ? (
-                        <span className="text-[9px] text-gray-300 dark:text-neutral-600">—</span>
+                        <span className="text-[11px] text-gray-300 dark:text-neutral-600">—</span>
                       ) : (
                         <button
                           onClick={() => handleToggleBan(user)}
                           disabled={busyUserId === user.id}
-                          className={`text-[9px] font-black px-3 py-1.5 rounded-full border transition-all disabled:opacity-50 flex items-center gap-1 ${
+                          className={`text-[11px] font-black px-3 py-1.5 rounded-full border transition-all disabled:opacity-50 flex items-center gap-1 ${
                             user.is_active
                               ? 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-300 border-red-200 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-950/60'
                               : 'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-300 border-green-200 dark:border-green-900 hover:bg-green-100 dark:hover:bg-green-950/60'
@@ -320,6 +327,34 @@ export default function AdminUsersPage() {
           </table>
         </div>
       </div>
+
+      {/* PAGINATION */}
+      {count > 0 && (
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <p className="text-xs font-bold text-gray-400 dark:text-neutral-500">
+            Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, count)} of {count} users
+          </p>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1 || loading}
+                className="px-4 py-2 rounded-xl bg-white dark:bg-neutral-800 border-2 border-gray-200 dark:border-neutral-700 text-xs font-black uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:border-blue-600 transition-colors dark:text-neutral-100"
+              >
+                Prev
+              </button>
+              <span className="text-sm font-black tabular-nums text-gray-600 dark:text-neutral-300 px-1">{page} / {totalPages}</span>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages || loading}
+                className="px-4 py-2 rounded-xl bg-white dark:bg-neutral-800 border-2 border-gray-200 dark:border-neutral-700 text-xs font-black uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:border-blue-600 transition-colors dark:text-neutral-100"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
