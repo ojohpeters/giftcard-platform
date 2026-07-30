@@ -455,24 +455,6 @@ export default function AdminProductsPage() {
               Refresh
             </button>
             <button
-              onClick={handleSeedSampleProducts}
-              disabled={syncing}
-              className="px-5 py-2.5 bg-green-500 text-white rounded-xl font-black uppercase text-xs hover:bg-green-600 transition-all flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Add sample products (no API key required)"
-            >
-              {syncing ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  Adding...
-                </>
-              ) : (
-                <>
-                  <Plus size={16} />
-                  Add Samples
-                </>
-              )}
-            </button>
-            <button
               onClick={() => setShowCreateModal(true)}
               className="px-6 py-3 bg-white text-blue-600 rounded-xl font-black uppercase text-xs hover:bg-blue-50 transition-all flex items-center gap-2 shadow-lg"
             >

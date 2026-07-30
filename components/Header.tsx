@@ -5,9 +5,12 @@ import { usePathname } from 'next/navigation';
 import {
   Menu, X, Zap, ArrowUpRight, Globe, LayoutDashboard, ShoppingCart,
   Shield, Home, ShoppingBag, Upload, LogOut, CheckCircle2, AlertCircle, ChevronRight, Lock, Newspaper,
+  History, MessageSquare, Gift, Settings, Wallet,
 } from "lucide-react";
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
+import { userAPI } from '@/lib/api';
+import { formatIRRShort } from '@/lib/currency';
 import LanguageSwitcher from './LanguageSwitcher';
 import ThemeToggle from './ThemeToggle';
 import { useI18n } from '@/lib/i18n';
@@ -28,6 +31,14 @@ export default function Header() {
   useEffect(() => setMounted(true), []);
   const authed = mounted && isAuthenticated;
   const isStaff = authed && !!user?.is_staff;
+
+  // Wallet balance for the mobile account panel (parity with the dashboard sidebar).
+  const [wallet, setWallet] = useState<{ balance: string } | null>(null);
+  useEffect(() => {
+    if (authed) {
+      userAPI.getWallet().then((r) => setWallet(r.data)).catch(() => {});
+    }
+  }, [authed]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : 'unset';
@@ -51,11 +62,15 @@ export default function Header() {
     { name: t("nav.sell"), href: "/sell", icon: Upload, authRequired: true },
   ];
 
+  // Full parity with the desktop dashboard sidebar so mobile users get every section.
   const dashboardLinks = [
-    { name: t("nav.overview"), href: "/dashboard" },
-    { name: t("nav.orders"), href: "/dashboard/orders" },
-    { name: t("nav.withdraw"), href: "/dashboard/withdraw" },
-    { name: t("nav.settings"), href: "/dashboard/settings" },
+    { name: t("dashNav.overview"), href: "/dashboard", icon: LayoutDashboard },
+    { name: t("dashNav.history"), href: "/dashboard/orders", icon: History },
+    { name: t("dashNav.submissions"), href: "/dashboard/submissions", icon: Upload },
+    { name: t("dashNav.support"), href: "/dashboard/support", icon: MessageSquare },
+    { name: t("dashNav.giftCodes"), href: "/dashboard/codes", icon: Gift },
+    { name: t("dashNav.payout"), href: "/dashboard/withdraw", icon: ArrowUpRight },
+    { name: t("dashNav.settings"), href: "/dashboard/settings", icon: Settings },
   ];
 
   const initial = (user?.first_name?.[0] || user?.email?.[0] || 'U').toUpperCase();
@@ -261,6 +276,15 @@ export default function Header() {
             <div>
               <p className="text-[9px] font-black text-gray-400 dark:text-neutral-500 uppercase tracking-[0.4em] mb-4 border-l-4 border-blue-600 pl-3">{t('nav.myAccount')}</p>
 
+              {/* Wallet balance (parity with the desktop sidebar) */}
+              <div className="flex items-center justify-between gap-3 p-4 mb-3 rounded-2xl border-2 border-black dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Wallet size={16} className="text-gray-400 dark:text-neutral-500 shrink-0" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">{t('dashNav.balance')}</span>
+                </div>
+                <span className="text-lg font-black text-gray-900 dark:text-neutral-100 truncate">{formatIRRShort(wallet?.balance || '0')} تومان</span>
+              </div>
+
               {isStaff && (
                 <Link href="/admin" className="flex items-center gap-3 p-4 mb-3 rounded-2xl border-2 border-blue-600 bg-blue-600 text-white font-black uppercase text-xs tracking-widest">
                   <Shield size={18} strokeWidth={3} /> {t('nav.admin')} {t('nav.dashboard')} <ArrowUpRight size={18} className="ml-auto rtl:rotate-180" />
@@ -268,19 +292,24 @@ export default function Header() {
               )}
 
               <div className="grid grid-cols-2 gap-3">
-                {dashboardLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`flex items-center justify-center p-4 rounded-2xl border-2 font-black uppercase text-[11px] tracking-widest text-center transition-all ${
-                      pathname === link.href
-                        ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
-                        : 'bg-white dark:bg-neutral-900 text-black dark:text-neutral-100 border-black dark:border-neutral-800 active:border-blue-600'
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
+                {dashboardLinks.map((link) => {
+                  const Icon = link.icon;
+                  const active = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`flex items-center gap-2.5 p-4 rounded-2xl border-2 font-black uppercase text-[11px] tracking-widest transition-all ${
+                        active
+                          ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
+                          : 'bg-white dark:bg-neutral-900 text-black dark:text-neutral-100 border-black dark:border-neutral-800 active:border-blue-600'
+                      }`}
+                    >
+                      <Icon size={16} className={`shrink-0 ${active ? '' : 'text-blue-600'}`} />
+                      <span className="truncate">{link.name}</span>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           )}

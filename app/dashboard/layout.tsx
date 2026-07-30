@@ -77,7 +77,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-screen bg-white dark:bg-[#0a0a0b] font-sans selection:bg-blue-50">
       
       {/* SIDEBAR - ICON CENTRIC & SLEEK */}
-      <aside className="w-64 bg-white dark:bg-neutral-900 border-r border-gray-100 dark:border-neutral-800 hidden lg:flex flex-col p-8 sticky top-0 h-screen">
+      <aside className="w-64 shrink-0 bg-white dark:bg-neutral-900 border-e border-gray-100 dark:border-neutral-800 hidden lg:flex flex-col p-8 sticky top-0 h-screen overflow-hidden">
         
         {/* TOP SPACER (Logo Removed) */}
         <div className="h-10 mb-12"></div>
@@ -107,15 +107,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* BOTTOM SECTION - WALLET & LOGOUT */}
         <div className="space-y-6">
-          <div className="bg-[#fcfcfd] dark:bg-neutral-800 border border-gray-100 dark:border-neutral-800 p-6 rounded-3xl">
+          <div className="bg-[#fcfcfd] dark:bg-neutral-800 border border-gray-100 dark:border-neutral-800 p-6 rounded-3xl overflow-hidden">
             <div className="flex items-center gap-2 mb-3">
-              <Wallet size={14} className="text-gray-400 dark:text-neutral-500" />
+              <Wallet size={14} className="text-gray-400 dark:text-neutral-500 shrink-0" />
               <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-widest">{t('dashNav.balance')}</p>
             </div>
-            <p className="text-xl font-black text-gray-900 dark:text-neutral-100 tracking-tighter">
+            <p className="text-xl font-black text-gray-900 dark:text-neutral-100 tracking-tighter truncate">
               {formatIRRShort(wallet?.balance || '0')} تومان
             </p>
-            <p className="text-[9px] text-gray-400 dark:text-neutral-500 font-bold uppercase tracking-widest mt-1">
+            <p className="text-[10px] text-gray-400 dark:text-neutral-500 font-medium mt-1 truncate" title={user?.email}>
               {user?.email}
             </p>
           </div>
