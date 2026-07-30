@@ -302,41 +302,47 @@ export default function OrdersPage() {
                       <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/40 rounded-xl flex items-center justify-center shrink-0">
                         <Gift className="text-blue-600" size={24} />
                       </div>
-                      <div>
-                        <p className="font-mono text-sm font-bold">{request.request_number}</p>
-                        <p className="text-sm font-medium mt-1">{request.brand_name}</p>
-                        <p className="text-xs text-gray-400 dark:text-neutral-500">{request.country_name} • {request.card_type}</p>
-                        <p className="text-xs text-gray-400 dark:text-neutral-500 mt-1">{formatDate(request.created_at)}</p>
+                      <div className="min-w-0">
+                        <p className="text-base md:text-lg font-black leading-tight">{request.brand_name}</p>
+                        <p className="font-mono text-xs text-gray-500 dark:text-neutral-400 mt-0.5">{request.request_number}</p>
+                        <p className="text-xs text-gray-400 dark:text-neutral-500 mt-1">{request.country_name} • {request.card_type}</p>
+                        <p className="text-xs text-gray-400 dark:text-neutral-500">{formatDate(request.created_at)}</p>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                      <div className="text-right">
-                        <p className="text-xs text-gray-400 dark:text-neutral-500">{t('dashOrders.amount')}</p>
-                        <p className="font-bold">${request.amount} × {request.quantity}</p>
+                    <div className="flex flex-col gap-3 md:items-end md:gap-2 border-t md:border-t-0 border-gray-100 dark:border-neutral-800 pt-4 md:pt-0">
+                      {/* Amounts — bigger, filling the row on mobile */}
+                      <div className="flex items-center justify-between md:justify-end gap-6">
+                        <div className="md:text-right">
+                          <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500">{t('dashOrders.amount')}</p>
+                          <p className="text-base font-black">${request.amount} × {request.quantity}</p>
+                        </div>
+                        <div className="md:text-right">
+                          <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500">{t('dashOrders.total')}</p>
+                          <p className="text-lg font-black text-green-600">{formatIRRShort(request.total_amount_irr ?? '0')} تومان</p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-xs text-gray-400 dark:text-neutral-500">{t('dashOrders.total')}</p>
-                        <p className="font-bold text-green-600">{formatIRRShort(request.total_amount_irr ?? '0')} تومان</p>
-                      </div>
-                      <UnifiedStatusBadge r={request} />
-                      {request.status === 'approved' && request.payment_status !== 'paid' && (
+                      {/* Status + actions */}
+                      <div className="flex items-center gap-2">
+                        <UnifiedStatusBadge r={request} />
+                        {request.status === 'approved' && request.payment_status !== 'paid' && (
+                          <button
+                            onClick={() => handlePay(request.id)}
+                            disabled={payingId === request.id}
+                            className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all disabled:opacity-50"
+                          >
+                            {payingId === request.id ? <Loader2 size={14} className="animate-spin" /> : <CreditCard size={14} />}
+                            {t('dashOrders.payNow')}
+                          </button>
+                        )}
                         <button
-                          onClick={() => handlePay(request.id)}
-                          disabled={payingId === request.id}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all disabled:opacity-50"
+                          onClick={() => setSelectedRequest(request)}
+                          className="p-2.5 bg-gray-100 dark:bg-neutral-800 rounded-xl hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all shrink-0"
+                          title={t('dashOrders.viewDetails')}
                         >
-                          {payingId === request.id ? <Loader2 size={14} className="animate-spin" /> : <CreditCard size={14} />}
-                          {t('dashOrders.payNow')}
+                          <Eye size={16} />
                         </button>
-                      )}
-                      <button
-                        onClick={() => setSelectedRequest(request)}
-                        className="p-2 bg-gray-100 dark:bg-neutral-800 rounded-lg hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all"
-                        title={t('dashOrders.viewDetails')}
-                      >
-                        <Eye size={16} />
-                      </button>
+                      </div>
                     </div>
                   </div>
 
