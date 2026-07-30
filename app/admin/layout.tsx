@@ -95,7 +95,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex min-h-screen bg-gray-50 dark:bg-[#0a0a0b] font-sans selection:bg-blue-50">
       
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white dark:bg-neutral-950 border-r border-gray-200 dark:border-neutral-800 hidden lg:flex flex-col p-6 sticky top-0 h-screen">
+      <aside className="w-64 shrink-0 bg-white dark:bg-neutral-950 border-e border-gray-200 dark:border-neutral-800 hidden lg:flex flex-col p-6 sticky top-0 h-screen">
         
         {/* LOGO */}
         <div className="mb-12">
@@ -287,7 +287,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 bg-gray-50 dark:bg-[#0a0a0b]">
+      <main className="flex-1 min-w-0 overflow-x-hidden bg-gray-50 dark:bg-[#0a0a0b]">
         <div className="p-6 md:p-12 max-w-7xl mx-auto">
           {children}
         </div>

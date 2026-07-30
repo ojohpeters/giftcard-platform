@@ -369,7 +369,7 @@ export default function OrdersPage() {
           ) : (
             <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-2xl overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full text-left">
+                <table className="w-full min-w-[640px] text-left">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900">
                       <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">{t('dashOrders.colOrderId')}</th>

@@ -743,8 +743,8 @@ export default function AdminProductsPage() {
           ))}
         </div>
       ) : (
-        <div className="bg-white dark:bg-neutral-900 border-2 border-gray-200 dark:border-neutral-700 rounded-3xl overflow-hidden">
-          <table className="w-full">
+        <div className="bg-white dark:bg-neutral-900 border-2 border-gray-200 dark:border-neutral-700 rounded-3xl overflow-x-auto">
+          <table className="w-full min-w-[900px]">
             <thead className="bg-gray-50 dark:bg-neutral-800 border-b-2 border-gray-200 dark:border-neutral-700">
               <tr>
                 <th className="p-4 text-left">

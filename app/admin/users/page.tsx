@@ -187,7 +187,7 @@ export default function AdminUsersPage() {
       {/* USERS TABLE */}
       <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-[32px] overflow-hidden shadow-lg">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[900px]">
             <thead className="bg-gray-50 dark:bg-neutral-800 border-b-2 border-gray-200 dark:border-neutral-700">
               <tr>
                 <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">

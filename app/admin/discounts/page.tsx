@@ -228,7 +228,7 @@ export default function AdminDiscountsPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[720px] text-sm">
               <thead>
                 <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500 border-b-2 border-gray-100 dark:border-neutral-800">
                   <th className="py-3 px-2">Code</th>

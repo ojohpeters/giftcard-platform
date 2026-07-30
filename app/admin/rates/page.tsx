@@ -93,8 +93,8 @@ export default function RatesPage() {
       )}
 
       {/* RATE TABLE */}
-      <div className="bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-700 rounded-[40px] overflow-hidden shadow-[16px_16px_0px_0px_rgba(240,240,240,1)] dark:shadow-none">
-        <table className="w-full text-left">
+      <div className="bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-700 rounded-[40px] overflow-x-auto shadow-[16px_16px_0px_0px_rgba(240,240,240,1)] dark:shadow-none">
+        <table className="w-full min-w-[560px] text-left">
           <thead>
             <tr className="border-b-2 border-black dark:border-neutral-700 text-[10px] font-black uppercase tracking-[0.3em] bg-gray-50 dark:bg-neutral-800 text-gray-400 dark:text-neutral-500">
               <th className="p-8">Asset/Currency</th>
