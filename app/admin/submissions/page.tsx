@@ -158,7 +158,7 @@ export default function AdminSubmissionsPage() {
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <div className="h-1 w-4 bg-purple-600"></div>
-          <p className="text-[9px] font-black text-purple-600 uppercase tracking-[0.4em]">Management</p>
+          <p className="text-[11px] font-black text-purple-600 uppercase tracking-[0.4em]">Management</p>
         </div>
         <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-neutral-100 tracking-tighter italic uppercase leading-none">
           Submissions<span className="text-gray-200 dark:text-neutral-700">.</span>
@@ -231,14 +231,14 @@ export default function AdminSubmissionsPage() {
             <table className="w-full text-left min-w-[600px]">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-800">
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500">ID</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500">User</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500">Type</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500">Amount</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 hidden sm:table-cell">Credit</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500">Status</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 hidden md:table-cell">Date</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 text-right">Actions</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">ID</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">User</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">Type</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">Amount</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500 hidden sm:table-cell">Credit</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">Status</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500 hidden md:table-cell">Date</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -251,7 +251,7 @@ export default function AdminSubmissionsPage() {
                       <span className="text-xs font-medium truncate max-w-[120px] block">{submission.user_email}</span>
                     </td>
                     <td className="px-3 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase whitespace-nowrap ${
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold uppercase whitespace-nowrap ${
                         submission.submission_type === 'ecode' 
                           ? 'bg-blue-50 text-blue-700' 
                           : 'bg-purple-50 text-purple-700'
@@ -270,7 +270,7 @@ export default function AdminSubmissionsPage() {
                       )}
                     </td>
                     <td className="px-3 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase flex items-center gap-1 w-fit border whitespace-nowrap ${getStatusColor(submission.status)}`}>
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold uppercase flex items-center gap-1 w-fit border whitespace-nowrap ${getStatusColor(submission.status)}`}>
                         {getStatusIcon(submission.status)}
                         {submission.status}
                       </span>
@@ -343,30 +343,30 @@ export default function AdminSubmissionsPage() {
 
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">User</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">User</p>
                 <p className="text-sm font-medium truncate">{selectedSubmission.user_email}</p>
               </div>
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Type</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Type</p>
                 <p className="text-sm font-medium uppercase">{selectedSubmission.submission_type === 'ecode' ? 'E-Code' : 'Physical Card'}</p>
               </div>
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Category</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Category</p>
                 <p className="text-sm font-medium">{selectedSubmission.category_name || 'N/A'}</p>
               </div>
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Amount</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Amount</p>
                 <p className="text-sm font-medium">${selectedSubmission.amount} {selectedSubmission.currency}</p>
               </div>
               {selectedSubmission.credit_amount && (
                 <div className="bg-green-50 rounded-xl p-3 col-span-2">
-                  <p className="text-[10px] font-bold text-green-600 uppercase mb-1">Credit Amount</p>
+                  <p className="text-[11px] font-bold text-green-600 uppercase mb-1">Credit Amount</p>
                   <p className="text-sm font-bold text-green-700">{formatIRRShort(selectedSubmission.credit_amount)} تومان</p>
                 </div>
               )}
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Status</p>
-                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(selectedSubmission.status)}`}>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Status</p>
+                <span className={`px-2 py-1 rounded-full text-[11px] font-bold uppercase border ${getStatusColor(selectedSubmission.status)}`}>
                   {selectedSubmission.status}
                 </span>
               </div>
@@ -374,33 +374,33 @@ export default function AdminSubmissionsPage() {
 
             {selectedSubmission.code && (
               <div className="mb-4">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">E-Code</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-2">E-Code</p>
                 <code className="block bg-gray-100 dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 p-3 rounded-xl font-mono text-sm break-all">{selectedSubmission.code}</code>
               </div>
             )}
 
             {selectedSubmission.comment && (
               <div className="mb-4">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">User Comment</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-2">User Comment</p>
                 <p className="bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-neutral-100 p-3 rounded-xl text-sm">{selectedSubmission.comment}</p>
               </div>
             )}
 
             {selectedSubmission.image && (
               <div className="mb-4">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Card Image</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-2">Card Image</p>
                 <img src={selectedSubmission.image} alt="Card" className="rounded-xl max-h-64 object-contain bg-gray-100 w-full" />
               </div>
             )}
 
             {selectedSubmission.admin_notes && (
               <div className="mb-4">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Admin Notes</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-2">Admin Notes</p>
                 <p className="bg-yellow-50 p-3 rounded-xl text-sm border border-yellow-200">{selectedSubmission.admin_notes}</p>
               </div>
             )}
 
-            <div className="text-[10px] text-gray-400 mb-4">
+            <div className="text-[11px] text-gray-400 mb-4">
               <p>Submitted: {formatDate(selectedSubmission.created_at)}</p>
               {selectedSubmission.reviewed_at && (
                 <p>Reviewed: {formatDate(selectedSubmission.reviewed_at)} by {selectedSubmission.reviewed_by_name}</p>

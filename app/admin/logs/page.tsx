@@ -149,7 +149,7 @@ export default function AdminLogsPage() {
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
             Action Logs<span className="text-blue-600">.</span>
           </h1>
-          <p className="text-[10px] md:text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-[0.4em] mt-2">
+          <p className="text-[11px] md:text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-[0.4em] mt-2">
             Audit Trail & Security Logs
           </p>
         </div>
@@ -251,17 +251,17 @@ export default function AdminLogsPage() {
           <table className="w-full min-w-[820px]">
             <thead className="bg-gray-50 dark:bg-neutral-800 border-b-2 border-gray-200 dark:border-neutral-700">
               <tr>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Time</th>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Admin</th>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Action</th>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Description</th>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Actions</th>
+                <th className="text-left px-4 py-4 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Time</th>
+                <th className="text-left px-4 py-4 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Admin</th>
+                <th className="text-left px-4 py-4 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Action</th>
+                <th className="text-left px-4 py-4 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Description</th>
+                <th className="text-left px-4 py-4 text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Actions</th>
               </tr>
             </thead>
             <tbody>
               {logs.map((log) => (
                 <tr key={log.id} className="border-b border-gray-100 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
-                  <td className="p-6">
+                  <td className="px-4 py-4">
                     <div className="flex items-center gap-2">
                       <Calendar size={14} className="text-gray-400 dark:text-neutral-500" />
                       <span className="text-xs text-gray-600 dark:text-neutral-300">
@@ -269,25 +269,25 @@ export default function AdminLogsPage() {
                       </span>
                     </div>
                   </td>
-                  <td className="p-6">
+                  <td className="px-4 py-4">
                     <div className="flex items-center gap-2">
                       <User size={14} className="text-gray-400 dark:text-neutral-500" />
                       <span className="text-xs font-bold text-gray-700 dark:text-neutral-300">{log.admin_email || 'System'}</span>
                     </div>
                   </td>
-                  <td className="p-6">
-                    <span className={`text-[9px] font-black px-3 py-1 rounded-full border ${
+                  <td className="px-4 py-4">
+                    <span className={`text-[11px] font-black px-3 py-1 rounded-full border ${
                       ACTION_TYPE_COLORS[log.action_type] || 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700'
                     }`}>
                       {ACTION_TYPE_LABELS[log.action_type] || log.action_type}
                     </span>
                   </td>
-                  <td className="p-6">
+                  <td className="px-4 py-4">
                     <p className="text-sm text-gray-700 dark:text-neutral-300 max-w-md truncate" title={log.description}>
                       {log.description}
                     </p>
                   </td>
-                  <td className="p-6">
+                  <td className="px-4 py-4">
                     <button
                       onClick={() => setSelectedLog(log)}
                       className="p-2 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all"

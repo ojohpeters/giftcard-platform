@@ -78,7 +78,7 @@ export default function AdminKycPage() {
         <h1 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter flex items-center gap-3">
           <Fingerprint className="text-blue-600" size={36} /> KYC Review
         </h1>
-        <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-widest mt-1">Identity verification submissions</p>
+        <p className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-widest mt-1">Identity verification submissions</p>
       </div>
 
       {/* Filter tabs */}
@@ -109,20 +109,20 @@ export default function AdminKycPage() {
                 <div>
                   <div className="flex items-center gap-3">
                     <p className="font-black text-gray-900 dark:text-neutral-100">{k.first_name} {k.last_name}</p>
-                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full border uppercase ${badge(k.status)}`}>{k.status}</span>
+                    <span className={`text-[11px] font-black px-2 py-0.5 rounded-full border uppercase ${badge(k.status)}`}>{k.status}</span>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-neutral-400 mt-1">{k.user_email}</p>
                 </div>
-                <p className="text-[10px] text-gray-400 dark:text-neutral-500 font-bold uppercase">
+                <p className="text-[11px] text-gray-400 dark:text-neutral-500 font-bold uppercase">
                   {new Date(k.submitted_at).toLocaleDateString()}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-xs">
-                <div><p className="text-gray-400 dark:text-neutral-500 font-bold uppercase text-[9px]">DOB</p><p className="font-bold">{k.date_of_birth}</p></div>
-                <div><p className="text-gray-400 dark:text-neutral-500 font-bold uppercase text-[9px]">Country</p><p className="font-bold">{k.country}</p></div>
-                <div><p className="text-gray-400 dark:text-neutral-500 font-bold uppercase text-[9px]">Document</p><p className="font-bold">{k.document_type_display}</p></div>
-                <div><p className="text-gray-400 dark:text-neutral-500 font-bold uppercase text-[9px]">Doc No.</p><p className="font-bold">{k.document_number}</p></div>
+                <div><p className="text-gray-400 dark:text-neutral-500 font-bold uppercase text-[11px]">DOB</p><p className="font-bold">{k.date_of_birth}</p></div>
+                <div><p className="text-gray-400 dark:text-neutral-500 font-bold uppercase text-[11px]">Country</p><p className="font-bold">{k.country}</p></div>
+                <div><p className="text-gray-400 dark:text-neutral-500 font-bold uppercase text-[11px]">Document</p><p className="font-bold">{k.document_type_display}</p></div>
+                <div><p className="text-gray-400 dark:text-neutral-500 font-bold uppercase text-[11px]">Doc No.</p><p className="font-bold">{k.document_number}</p></div>
               </div>
 
               {/* Document links */}

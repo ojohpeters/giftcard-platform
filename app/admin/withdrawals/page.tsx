@@ -177,7 +177,7 @@ export default function AdminWithdrawalsPage() {
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <div className="h-1 w-4 bg-green-600"></div>
-          <p className="text-[9px] font-black text-green-600 uppercase tracking-[0.4em]">Finance</p>
+          <p className="text-[11px] font-black text-green-600 uppercase tracking-[0.4em]">Finance</p>
         </div>
         <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-neutral-100 tracking-tighter italic uppercase leading-none">
           Withdrawals<span className="text-gray-200">.</span>
@@ -188,19 +188,19 @@ export default function AdminWithdrawalsPage() {
       {/* STATS CARDS */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="bg-yellow-50 dark:bg-yellow-950/40 border border-yellow-200 dark:border-yellow-900 rounded-xl p-4">
-          <p className="text-[10px] font-bold text-yellow-600 dark:text-yellow-300 uppercase">Pending</p>
+          <p className="text-[11px] font-bold text-yellow-600 dark:text-yellow-300 uppercase">Pending</p>
           <p className="text-xl font-black text-yellow-700 dark:text-yellow-300">{stats.pending?.count || 0}</p>
         </div>
         <div className="bg-yellow-50 dark:bg-yellow-950/40 border border-yellow-200 dark:border-yellow-900 rounded-xl p-4">
-          <p className="text-[10px] font-bold text-yellow-600 dark:text-yellow-300 uppercase">Pending Amount</p>
+          <p className="text-[11px] font-bold text-yellow-600 dark:text-yellow-300 uppercase">Pending Amount</p>
           <p className="text-lg font-black text-yellow-700 dark:text-yellow-300">{formatIRRShort(stats.pending?.total || '0')} ت</p>
         </div>
         <div className="bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-900 rounded-xl p-4">
-          <p className="text-[10px] font-bold text-green-600 dark:text-green-300 uppercase">Completed</p>
+          <p className="text-[11px] font-bold text-green-600 dark:text-green-300 uppercase">Completed</p>
           <p className="text-xl font-black text-green-700 dark:text-green-300">{stats.completed?.count || 0}</p>
         </div>
         <div className="bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-900 rounded-xl p-4">
-          <p className="text-[10px] font-bold text-green-600 dark:text-green-300 uppercase">Completed Amount</p>
+          <p className="text-[11px] font-bold text-green-600 dark:text-green-300 uppercase">Completed Amount</p>
           <p className="text-lg font-black text-green-700 dark:text-green-300">{formatIRRShort(stats.completed?.total || '0')} ت</p>
         </div>
       </div>
@@ -270,13 +270,13 @@ export default function AdminWithdrawalsPage() {
             <table className="w-full text-left min-w-[600px]">
               <thead>
                 <tr className="border-b border-gray-100 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-800">
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">ID</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">User</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">Amount</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 hidden sm:table-cell">Bank</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">Status</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 hidden md:table-cell">Date</th>
-                  <th className="px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 text-right">Actions</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">ID</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">User</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">Amount</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 hidden sm:table-cell">Bank</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">Status</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 hidden md:table-cell">Date</th>
+                  <th className="px-3 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-neutral-800">
@@ -295,7 +295,7 @@ export default function AdminWithdrawalsPage() {
                       <span className="text-xs text-gray-600 dark:text-neutral-300 truncate max-w-[100px] block">{withdrawal.bank_name}</span>
                     </td>
                     <td className="px-3 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase flex items-center gap-1 w-fit border whitespace-nowrap ${getStatusColor(withdrawal.status)}`}>
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold uppercase flex items-center gap-1 w-fit border whitespace-nowrap ${getStatusColor(withdrawal.status)}`}>
                         {getStatusIcon(withdrawal.status)}
                         {withdrawal.status}
                       </span>
@@ -368,19 +368,19 @@ export default function AdminWithdrawalsPage() {
 
             {/* Amount */}
             <div className="bg-green-50 dark:bg-green-950/40 rounded-xl p-4 mb-4 text-center">
-              <p className="text-[10px] font-bold text-green-600 dark:text-green-300 uppercase mb-1">Amount</p>
+              <p className="text-[11px] font-bold text-green-600 dark:text-green-300 uppercase mb-1">Amount</p>
               <p className="text-2xl font-black text-green-700 dark:text-green-300">{formatIRRShort(selectedWithdrawal.amount)} تومان</p>
             </div>
 
             {/* User Info */}
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-gray-50 dark:bg-neutral-800 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">User</p>
+                <p className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">User</p>
                 <p className="text-sm font-medium truncate">{selectedWithdrawal.user.email}</p>
               </div>
               <div className="bg-gray-50 dark:bg-neutral-800 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">Status</p>
-                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(selectedWithdrawal.status)}`}>
+                <p className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">Status</p>
+                <span className={`px-2 py-1 rounded-full text-[11px] font-bold uppercase border ${getStatusColor(selectedWithdrawal.status)}`}>
                   {selectedWithdrawal.status}
                 </span>
               </div>
@@ -390,7 +390,7 @@ export default function AdminWithdrawalsPage() {
             <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-xl p-4 mb-4">
               <div className="flex items-center gap-2 mb-3">
                 <Building2 size={16} className="text-blue-600" />
-                <p className="text-[10px] font-bold text-blue-600 dark:text-blue-300 uppercase">Bank Details</p>
+                <p className="text-[11px] font-bold text-blue-600 dark:text-blue-300 uppercase">Bank Details</p>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -411,13 +411,13 @@ export default function AdminWithdrawalsPage() {
             {/* Admin Notes */}
             {selectedWithdrawal.admin_notes && (
               <div className="mb-4">
-                <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">Admin Notes</p>
+                <p className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">Admin Notes</p>
                 <p className="bg-yellow-50 dark:bg-yellow-950/40 p-3 rounded-xl text-sm border border-yellow-200 dark:border-yellow-900">{selectedWithdrawal.admin_notes}</p>
               </div>
             )}
 
             {/* Dates */}
-            <div className="text-[10px] text-gray-400 dark:text-neutral-500 mb-4 space-y-1">
+            <div className="text-[11px] text-gray-400 dark:text-neutral-500 mb-4 space-y-1">
               <p>Requested: {formatDate(selectedWithdrawal.created_at)}</p>
               {selectedWithdrawal.processed_at && (
                 <p>Processed: {formatDate(selectedWithdrawal.processed_at)} by {selectedWithdrawal.processed_by?.email}</p>

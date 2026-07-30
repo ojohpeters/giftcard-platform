@@ -305,7 +305,7 @@ export default function AdminPurchaseRequestsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left min-w-[800px]">
               <thead>
-                <tr className="border-b border-gray-100 text-[10px] font-bold uppercase tracking-wider bg-gray-50 text-gray-500 dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-400">
+                <tr className="border-b border-gray-100 text-[11px] font-bold uppercase tracking-wider bg-gray-50 text-gray-500 dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-400">
                   <th className="p-3 md:p-4">Request #</th>
                   <th className="p-3 md:p-4">User</th>
                   <th className="p-3 md:p-4">Product</th>
@@ -329,7 +329,7 @@ export default function AdminPurchaseRequestsPage() {
                     <td className="p-3 md:p-4">
                       <div>
                         <p className="font-bold text-xs md:text-sm">{request.brand_name}</p>
-                        <p className="text-[10px] text-gray-400 dark:text-neutral-500">{request.country_name} • {request.card_type}</p>
+                        <p className="text-[11px] text-gray-400 dark:text-neutral-500">{request.country_name} • {request.card_type}</p>
                       </div>
                     </td>
                     <td className="p-3 md:p-4">
@@ -339,13 +339,13 @@ export default function AdminPurchaseRequestsPage() {
                       <span className="font-bold text-green-600 text-xs md:text-sm">{formatIRRShort(request.total_amount_irr ?? '0')} تومان</span>
                     </td>
                     <td className="p-3 md:p-4">
-                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase flex items-center gap-1 w-fit border ${getStatusColor(request.status)}`}>
+                      <span className={`px-2 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1 w-fit border ${getStatusColor(request.status)}`}>
                         {getStatusIcon(request.status)}
                         <span className="hidden sm:inline">{request.status.replace('_', ' ')}</span>
                       </span>
                     </td>
                     <td className="p-3 md:p-4 hidden md:table-cell">
-                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${getPaymentStatusColor(request.payment_status)}`}>
+                      <span className={`px-2 py-1 rounded-full text-[11px] font-bold uppercase border ${getPaymentStatusColor(request.payment_status)}`}>
                         {request.payment_status}
                       </span>
                     </td>
@@ -440,38 +440,38 @@ export default function AdminPurchaseRequestsPage() {
 
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">User</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">User</p>
                 <p className="text-sm font-medium truncate">{getUserEmail(selectedRequest)}</p>
               </div>
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Brand</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Brand</p>
                 <p className="text-sm font-medium">{selectedRequest.brand_name}</p>
               </div>
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Country</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Country</p>
                 <p className="text-sm font-medium">{selectedRequest.country_name}</p>
               </div>
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Card Type</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Card Type</p>
                 <p className="text-sm font-medium">{selectedRequest.card_type}</p>
               </div>
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Amount</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Amount</p>
                 <p className="text-sm font-medium">${selectedRequest.amount} × {selectedRequest.quantity}</p>
               </div>
               <div className="bg-green-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-green-600 uppercase mb-1">Total (IRR)</p>
+                <p className="text-[11px] font-bold text-green-600 uppercase mb-1">Total (IRR)</p>
                 <p className="text-sm font-bold text-green-700">{formatIRRShort(selectedRequest.total_amount_irr ?? '0')} تومان</p>
               </div>
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Status</p>
-                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(selectedRequest.status)}`}>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Status</p>
+                <span className={`px-2 py-1 rounded-full text-[11px] font-bold uppercase border ${getStatusColor(selectedRequest.status)}`}>
                   {selectedRequest.status.replace('_', ' ')}
                 </span>
               </div>
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Payment</p>
-                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${getPaymentStatusColor(selectedRequest.payment_status)}`}>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Payment</p>
+                <span className={`px-2 py-1 rounded-full text-[11px] font-bold uppercase border ${getPaymentStatusColor(selectedRequest.payment_status)}`}>
                   {selectedRequest.payment_status}
                 </span>
               </div>
@@ -483,26 +483,26 @@ export default function AdminPurchaseRequestsPage() {
               const fullName = u ? `${u.first_name || ''} ${u.last_name || ''}`.trim() : '';
               return (
                 <div className="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Customer</p>
+                  <p className="text-[11px] font-bold text-gray-400 uppercase mb-2">Customer</p>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                     <div>
-                      <span className="text-[10px] text-gray-400 uppercase block">Name</span>
+                      <span className="text-[11px] text-gray-400 uppercase block">Name</span>
                       <span className="text-sm font-medium">{fullName || '—'}</span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-gray-400 uppercase block">Email</span>
+                      <span className="text-[11px] text-gray-400 uppercase block">Email</span>
                       <span className="text-sm font-medium break-all">{u?.email || getUserEmail(selectedRequest)}</span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-gray-400 uppercase block">Phone</span>
+                      <span className="text-[11px] text-gray-400 uppercase block">Phone</span>
                       <span className="text-sm font-medium">{u?.phone_number || '—'}</span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-gray-400 uppercase block">IP address</span>
+                      <span className="text-[11px] text-gray-400 uppercase block">IP address</span>
                       <span className="text-sm font-medium">{selectedRequest.customer_ip || '—'}</span>
                     </div>
                     <div className="col-span-2">
-                      <span className="text-[10px] text-gray-400 uppercase block">Browser / device</span>
+                      <span className="text-[11px] text-gray-400 uppercase block">Browser / device</span>
                       <span className="text-xs text-gray-600 break-all">{selectedRequest.customer_user_agent || '—'}</span>
                     </div>
                   </div>
@@ -512,7 +512,7 @@ export default function AdminPurchaseRequestsPage() {
 
             {selectedRequest.assigned_codes && selectedRequest.assigned_codes.length > 0 && (
               <div className="mb-4">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Assigned Codes</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-2">Assigned Codes</p>
                 <div className="bg-gray-100 p-3 rounded-xl space-y-1">
                   {selectedRequest.assigned_codes.map((code, idx) => (
                     <code key={idx} className="block font-mono text-sm">{code}</code>
@@ -523,19 +523,19 @@ export default function AdminPurchaseRequestsPage() {
 
             {selectedRequest.admin_notes && (
               <div className="mb-4">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Admin Notes</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Admin Notes</p>
                 <p className="bg-blue-50 p-3 rounded-xl text-sm border border-blue-200">{selectedRequest.admin_notes}</p>
               </div>
             )}
 
             {selectedRequest.rejection_reason && (
               <div className="mb-4">
-                <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Rejection Reason</p>
+                <p className="text-[11px] font-bold text-gray-400 uppercase mb-1">Rejection Reason</p>
                 <p className="bg-red-50 p-3 rounded-xl text-sm border border-red-200">{selectedRequest.rejection_reason}</p>
               </div>
             )}
 
-            <p className="text-[10px] text-gray-400 mb-4">
+            <p className="text-[11px] text-gray-400 mb-4">
               Created: {formatDate(selectedRequest.created_at)}
             </p>
 

@@ -98,7 +98,7 @@ export default function AdminSupportPage() {
         <h1 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter flex items-center gap-3">
           <MessageSquare className="text-blue-600" size={34} /> Support
         </h1>
-        <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-widest mt-1">User tickets & replies</p>
+        <p className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-widest mt-1">User tickets & replies</p>
       </div>
 
       <div className="grid lg:grid-cols-[380px_1fr] gap-4 md:gap-6">
@@ -107,7 +107,7 @@ export default function AdminSupportPage() {
           <div className="flex flex-wrap gap-2">
             {STATUS_TABS.map((f) => (
               <button key={f || 'all'} onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all ${
                   filter === f ? 'bg-blue-600 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50 dark:bg-neutral-900 dark:text-neutral-400 dark:border-neutral-700 dark:hover:bg-neutral-800'
                 }`}>
                 {f ? f.replace('_', ' ') : 'All'}
@@ -159,13 +159,13 @@ export default function AdminSupportPage() {
                       <User size={12} /> {selected.user_name || selected.user_email} · {selected.user_email}
                     </p>
                   </div>
-                  <span className={`shrink-0 text-[9px] font-black px-2 py-1 rounded-full border uppercase ${statusBadge[selected.status] || ''}`}>{selected.status.replace('_', ' ')}</span>
+                  <span className={`shrink-0 text-[11px] font-black px-2 py-1 rounded-full border uppercase ${statusBadge[selected.status] || ''}`}>{selected.status.replace('_', ' ')}</span>
                 </div>
                 {/* status controls */}
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <button disabled={busy} onClick={() => setStatus('in_progress')} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow-50 text-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-300 text-[10px] font-black uppercase tracking-widest hover:bg-yellow-100 dark:hover:bg-yellow-900/40 disabled:opacity-50"><Clock size={12} /> In Progress</button>
-                  <button disabled={busy} onClick={() => setStatus('resolved')} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300 text-[10px] font-black uppercase tracking-widest hover:bg-green-100 dark:hover:bg-green-900/40 disabled:opacity-50"><CheckCircle2 size={12} /> Resolve</button>
-                  <button disabled={busy} onClick={() => setStatus('closed')} className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-neutral-300 text-[10px] font-black uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-neutral-700 disabled:opacity-50">Close</button>
+                  <button disabled={busy} onClick={() => setStatus('in_progress')} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow-50 text-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-300 text-[11px] font-black uppercase tracking-widest hover:bg-yellow-100 dark:hover:bg-yellow-900/40 disabled:opacity-50"><Clock size={12} /> In Progress</button>
+                  <button disabled={busy} onClick={() => setStatus('resolved')} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300 text-[11px] font-black uppercase tracking-widest hover:bg-green-100 dark:hover:bg-green-900/40 disabled:opacity-50"><CheckCircle2 size={12} /> Resolve</button>
+                  <button disabled={busy} onClick={() => setStatus('closed')} className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-neutral-300 text-[11px] font-black uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-neutral-700 disabled:opacity-50">Close</button>
                 </div>
               </div>
 
@@ -174,11 +174,11 @@ export default function AdminSupportPage() {
                 {(selected.messages || []).map((m) => (
                   <div key={m.id} className={`flex ${m.is_admin ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${m.is_admin ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900 dark:bg-neutral-800 dark:text-neutral-100'}`}>
-                      <div className={`flex items-center gap-1.5 mb-1 text-[9px] font-black uppercase tracking-widest ${m.is_admin ? 'text-blue-100' : 'text-gray-400 dark:text-neutral-500'}`}>
+                      <div className={`flex items-center gap-1.5 mb-1 text-[11px] font-black uppercase tracking-widest ${m.is_admin ? 'text-blue-100' : 'text-gray-400 dark:text-neutral-500'}`}>
                         {m.is_admin ? <><ShieldCheck size={10} /> Support</> : <><User size={10} /> {m.sender_email}</>}
                       </div>
                       <p className="text-sm whitespace-pre-wrap break-words">{m.message}</p>
-                      <p className={`text-[9px] mt-1 ${m.is_admin ? 'text-blue-200' : 'text-gray-400 dark:text-neutral-500'}`}>{fmt(m.created_at)}</p>
+                      <p className={`text-[11px] mt-1 ${m.is_admin ? 'text-blue-200' : 'text-gray-400 dark:text-neutral-500'}`}>{fmt(m.created_at)}</p>
                     </div>
                   </div>
                 ))}

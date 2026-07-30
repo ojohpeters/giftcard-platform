@@ -230,7 +230,7 @@ export default function AdminDiscountsPage() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-sm">
               <thead>
-                <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500 border-b-2 border-gray-100 dark:border-neutral-800">
+                <tr className="text-left text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500 border-b-2 border-gray-100 dark:border-neutral-800">
                   <th className="py-3 px-2">Code</th>
                   <th className="py-3 px-2">Value</th>
                   <th className="py-3 px-2">Min order</th>
@@ -260,8 +260,8 @@ export default function AdminDiscountsPage() {
                     <td className="py-4 px-2">
                       <button onClick={() => toggleActive(d)} title="Toggle active" className="inline-flex items-center gap-1.5">
                         {d.is_active
-                          ? <><ToggleRight size={22} className="text-green-500" /><span className="text-[10px] font-black uppercase text-green-600">Active</span></>
-                          : <><ToggleLeft size={22} className="text-gray-400" /><span className="text-[10px] font-black uppercase text-gray-400">Off</span></>}
+                          ? <><ToggleRight size={22} className="text-green-500" /><span className="text-[11px] font-black uppercase text-green-600">Active</span></>
+                          : <><ToggleLeft size={22} className="text-gray-400" /><span className="text-[11px] font-black uppercase text-gray-400">Off</span></>}
                       </button>
                     </td>
                     <td className="py-4 px-2">
@@ -385,7 +385,7 @@ const inputCls = "w-full bg-gray-50 dark:bg-neutral-800 border-2 border-gray-200
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-[10px] font-black text-gray-500 dark:text-neutral-400 uppercase tracking-widest mb-2 block">{label}</label>
+      <label className="text-[11px] font-black text-gray-500 dark:text-neutral-400 uppercase tracking-widest mb-2 block">{label}</label>
       {children}
     </div>
   );

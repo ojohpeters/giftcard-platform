@@ -43,7 +43,7 @@ export default function RatesPage() {
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-4xl font-black tracking-tighter uppercase italic leading-none">Global Rates</h1>
-          <p className="text-gray-500 dark:text-neutral-400 font-medium mt-2 uppercase text-[10px] tracking-widest">Adjust Profit Margins & Asset Value</p>
+          <p className="text-gray-500 dark:text-neutral-400 font-medium mt-2 uppercase text-[11px] tracking-widest">Adjust Profit Margins & Asset Value</p>
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
@@ -96,7 +96,7 @@ export default function RatesPage() {
       <div className="bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-700 rounded-[40px] overflow-x-auto shadow-[16px_16px_0px_0px_rgba(240,240,240,1)] dark:shadow-none">
         <table className="w-full min-w-[560px] text-left">
           <thead>
-            <tr className="border-b-2 border-black dark:border-neutral-700 text-[10px] font-black uppercase tracking-[0.3em] bg-gray-50 dark:bg-neutral-800 text-gray-400 dark:text-neutral-500">
+            <tr className="border-b-2 border-black dark:border-neutral-700 text-[11px] font-black uppercase tracking-[0.3em] bg-gray-50 dark:bg-neutral-800 text-gray-400 dark:text-neutral-500">
               <th className="p-8">Asset/Currency</th>
               <th className="p-8">Our Buy (تومان)</th>
               <th className="p-8">Our Sell (تومان)</th>
@@ -119,7 +119,7 @@ export default function RatesPage() {
                 <td className="p-8">
                   <button 
                     onClick={() => toggleStatus(rate.id)}
-                    className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${
+                    className={`px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${
                       rate.status === "Active" ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300" : "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
                     }`}
                   >
