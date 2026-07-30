@@ -1,13 +1,29 @@
 @import "tailwindcss";
 
+/* Class-based dark mode: a `.dark` class on <html> toggles every `dark:` variant. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  /* Geist Sans is now the primary font */
-  --font-sans: var(--font-geist-sans), "Inter", ui-sans-serif, system-ui;
+  /* Geist for Latin; Vazirmatn covers Persian/Arabic glyphs (per-glyph fallback). */
+  --font-sans: var(--font-geist-sans), var(--font-vazir), "Inter", ui-sans-serif, system-ui;
+}
+
+/* When the document is RTL (Persian), lead with Vazirmatn so Persian shaping is
+   correct even for any mixed content. */
+:root[dir="rtl"] {
+  --font-sans: var(--font-vazir), var(--font-geist-sans), ui-sans-serif, system-ui;
 }
 
 :root {
   --background: #ffffff;
   --foreground: #0a0a0b;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #0a0a0b;
+  --foreground: #ededed;
+  color-scheme: dark;
 }
 
 /* Force high-end typography and smooth rendering */
@@ -17,6 +33,11 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+}
+
+/* Smooth theme transition — only enabled after first paint to avoid a flash. */
+html.theme-ready, html.theme-ready body {
+  transition: background-color .25s ease, color .25s ease, border-color .25s ease;
 }
 
 /* Custom selection color for that premium feel */
@@ -41,6 +62,14 @@ html, body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #d1d5db;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #333;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
 }
 
 /* --- TERMINAL SPECIFIC SCROLLBAR (For the Dark Calculator) --- */
@@ -87,4 +116,79 @@ html, body {
     transform: scaleY(1.5);
     opacity: 0.8;
   }
+}
+
+/* --- GOOGLE TRANSLATE WIDGET STYLES --- */
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+.skiptranslate {
+  display: none !important;
+}
+
+body > .skiptranslate {
+  display: none !important;
+}
+
+#google_translate_element {
+  display: flex;
+  align-items: center;
+}
+
+#google_translate_element select {
+  padding: 8px 12px;
+  border: 2px solid #000;
+  border-radius: 8px;
+  background: white;
+  color: #0a0a0b;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
+  min-width: 120px;
+}
+
+.dark #google_translate_element select {
+  border-color: #333;
+  background: #171717;
+  color: #ededed;
+}
+
+#google_translate_element select:hover {
+  border-color: #2563eb;
+}
+
+.goog-te-gadget {
+  font-size: 0 !important;
+}
+
+.goog-te-gadget-simple {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.goog-te-gadget-simple span {
+  display: none !important;
+}
+
+.goog-te-menu-value span:first-child {
+  display: none;
+}
+
+.goog-te-gadget-icon {
+  display: none !important;
+}
+
+/* Translated content styling */
+.translate-this {
+  direction: ltr;
+}
+
+/* Ensure RTL languages display correctly */
+[lang="fa"], [lang="ar"] {
+  direction: rtl;
+  text-align: right;
 }

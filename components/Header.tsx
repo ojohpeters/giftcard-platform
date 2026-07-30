@@ -2,188 +2,301 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Zap, ArrowUpRight, Globe, LayoutDashboard, ShoppingCart, Shield, Home } from "lucide-react";
+import {
+  Menu, X, Zap, ArrowUpRight, Globe, LayoutDashboard, ShoppingCart,
+  Shield, Home, ShoppingBag, Upload, LogOut, CheckCircle2, AlertCircle, ChevronRight, Lock, Newspaper,
+} from "lucide-react";
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
+import LanguageSwitcher from './LanguageSwitcher';
+import ThemeToggle from './ThemeToggle';
+import { useI18n } from '@/lib/i18n';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const cartCount = useCartStore((state) => state.getCartCount());
   const fetchCart = useCartStore((state) => state.fetchCart);
+  const { t } = useI18n();
+
+  // Only trust auth state after mount so SSR and the first client paint agree
+  // (avoids a hydration flash where the nav shows the wrong auth UI).
+  useEffect(() => setMounted(true), []);
+  const authed = mounted && isAuthenticated;
+  const isStaff = authed && !!user?.is_staff;
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : 'unset';
+    return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchCart();
-    }
+    if (isAuthenticated) fetchCart();
   }, [isAuthenticated, fetchCart]);
 
+  // Close the mobile menu whenever the route changes.
+  useEffect(() => { setIsOpen(false); }, [pathname]);
+
+  // Buy & Sell require an account — logged-out users are routed to login first
+  // (which returns them to the intended page via ?redirect=).
   const mainLinks = [
-    { name: "Home", href: "/" },
-    { name: "Market", href: "/marketplace" },
-    ...(isAuthenticated ? [{ name: "Manifest", href: "/cart" }] : []),
+    { name: t("nav.home"), href: "/", icon: Home, authRequired: false },
+    { name: t("nav.market"), href: "/marketplace", icon: Globe, authRequired: false },
+    { name: t("nav.blog"), href: "/blog", icon: Newspaper, authRequired: false },
+    { name: t("nav.buy"), href: "/buy", icon: ShoppingBag, authRequired: true },
+    { name: t("nav.sell"), href: "/sell", icon: Upload, authRequired: true },
   ];
 
   const dashboardLinks = [
-    { name: "Overview", href: "/dashboard" },
-    { name: "Orders", href: "/dashboard/orders" },
-    { name: "Withdraw", href: "/dashboard/withdraw" },
-    { name: "Settings", href: "/dashboard/settings" },
+    { name: t("nav.overview"), href: "/dashboard" },
+    { name: t("nav.orders"), href: "/dashboard/orders" },
+    { name: t("nav.withdraw"), href: "/dashboard/withdraw" },
+    { name: t("nav.settings"), href: "/dashboard/settings" },
   ];
 
+  const initial = (user?.first_name?.[0] || user?.email?.[0] || 'U').toUpperCase();
+  const isActive = (href: string) => pathname === href || (href !== '/' && pathname.startsWith(href));
+  // Gate auth-only links behind login while preserving the destination.
+  const gated = (link: { href: string; authRequired: boolean }) => link.authRequired && !authed;
+  const hrefFor = (link: { href: string; authRequired: boolean }) =>
+    gated(link) ? `/login?redirect=${encodeURIComponent(link.href)}` : link.href;
+
   return (
-    <nav className="relative z-[150] bg-white border-b-4 border-black font-sans">
+    <nav className="relative z-[150] bg-white dark:bg-neutral-950 border-b-4 border-black dark:border-neutral-800 font-sans">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="flex justify-between items-center h-20 md:h-24">
-          
-          {/* LOGO - UPDATED AESTHETIC */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="bg-blue-600 text-white p-2 md:p-2.5 rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:rotate-6 group-hover:bg-black transition-all duration-300">
+
+          {/* LOGO */}
+          <Link href="/" className="flex items-center gap-3 group shrink-0">
+            <div className="bg-blue-600 text-white p-2 md:p-2.5 rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.15)] group-hover:rotate-6 group-hover:bg-black dark:group-hover:bg-white dark:group-hover:text-black transition-all duration-300">
               <Zap size={22} fill="currentColor" />
             </div>
             <div className="flex items-baseline gap-0.5">
-              <span className="text-2xl md:text-3xl font-black uppercase tracking-tighter italic leading-none text-black">HiGc</span>
+              <span className="text-2xl md:text-3xl font-black uppercase tracking-tighter italic leading-none text-black dark:text-neutral-100">HiGc</span>
               <span className="text-blue-600 font-black text-3xl leading-none">.</span>
             </div>
           </Link>
 
-          {/* DESKTOP LINKS - REFINED SPACING */}
-          <div className="hidden lg:flex items-center gap-10">
+          {/* DESKTOP LINKS */}
+          <div className="hidden lg:flex items-center gap-7">
             {mainLinks.map((link) => (
-              <Link 
-                key={link.href} 
-                href={link.href}
-                className={`text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:text-blue-600 relative py-2 ${
-                  pathname === link.href ? 'text-blue-600 after:content-[""] after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-blue-600' : 'text-black'
+              <Link
+                key={link.href}
+                href={hrefFor(link)}
+                title={gated(link) ? 'Sign in to continue' : undefined}
+                className={`text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:text-blue-600 relative py-2 inline-flex items-center gap-1.5 ${
+                  isActive(link.href) ? 'text-blue-600 after:content-[""] after:absolute after:-bottom-0.5 after:left-0 after:w-full after:h-1 after:bg-blue-600' : 'text-black dark:text-neutral-200'
                 }`}
               >
                 {link.name}
+                {gated(link) && <Lock size={11} strokeWidth={3} className="text-gray-400 dark:text-neutral-500" aria-label="Login required" />}
               </Link>
             ))}
-            {isAuthenticated && (
+
+            <LanguageSwitcher />
+            <ThemeToggle />
+
+            <div className="h-8 w-px bg-black/10 dark:bg-white/15 mx-1" />
+
+            {/* Auth-dependent cluster */}
+            {authed ? (
               <>
-                <div className="h-8 w-[3px] bg-black mx-2 opacity-10" />
-                <Link href="/cart" className="relative flex items-center gap-2 bg-black text-white px-6 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-black hover:bg-blue-600 hover:border-blue-600 transition-all shadow-[5px_5px_0px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-1 active:translate-y-1">
-                  <ShoppingCart size={14} strokeWidth={3} /> 
+                <Link href="/cart" aria-label="Cart" className="relative flex items-center justify-center w-12 h-12 bg-gray-50 dark:bg-neutral-900 text-black dark:text-neutral-100 rounded-xl border-2 border-black dark:border-neutral-700 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all">
+                  <ShoppingCart size={16} strokeWidth={3} />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[8px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-black">
+                    <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-[9px] font-black min-w-5 h-5 px-1 rounded-full flex items-center justify-center border-2 border-white dark:border-neutral-950">
                       {cartCount}
                     </span>
                   )}
                 </Link>
-                {user?.is_staff ? (
-                  <Link href="/admin" className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-blue-600 hover:bg-black hover:border-black transition-all shadow-[5px_5px_0px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-1 active:translate-y-1">
-                    <Shield size={14} strokeWidth={3} /> Admin
-                  </Link>
-                ) : (
-                  <Link href="/dashboard" className="flex items-center gap-2 bg-black text-white px-6 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-black hover:bg-blue-600 hover:border-blue-600 transition-all shadow-[5px_5px_0px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-1 active:translate-y-1">
-                    <LayoutDashboard size={14} strokeWidth={3} /> Dashboard
+
+                {isStaff && (
+                  <Link href="/admin" className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-blue-600 hover:bg-black hover:border-black dark:hover:bg-white dark:hover:text-black dark:hover:border-white transition-all">
+                    <Shield size={14} strokeWidth={3} /> {t('nav.admin')}
                   </Link>
                 )}
-              </>
-            )}
-            {!isAuthenticated && (
-              <>
-                <div className="h-8 w-[3px] bg-black mx-2 opacity-10" />
-                <Link href="/login" className="flex items-center gap-2 bg-black text-white px-6 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-black hover:bg-blue-600 hover:border-blue-600 transition-all shadow-[5px_5px_0px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-1 active:translate-y-1">
-                  Login
+
+                {/* Profile chip -> dashboard */}
+                <Link href="/dashboard" className="flex items-center gap-2.5 pl-1.5 pr-4 py-1.5 rounded-full border-2 border-black dark:border-neutral-700 hover:border-blue-600 bg-white dark:bg-neutral-900 transition-all group">
+                  <span className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-sm group-hover:bg-black dark:group-hover:bg-white dark:group-hover:text-black transition-colors">{initial}</span>
+                  <span className="text-[11px] font-black uppercase tracking-wider text-black dark:text-neutral-100 max-w-[100px] truncate">{user?.first_name || t('nav.account')}</span>
                 </Link>
               </>
+            ) : mounted ? (
+              <>
+                <Link href="/login" className="text-[11px] font-black uppercase tracking-[0.2em] text-black dark:text-neutral-200 hover:text-blue-600 transition-colors">
+                  {t('nav.login')}
+                </Link>
+                <Link href="/register" className="flex items-center gap-2 bg-black dark:bg-white dark:text-black text-white px-5 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-black dark:border-white hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,0.15)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5">
+                  {t('nav.getStarted')} <ArrowUpRight size={14} strokeWidth={3} className="rtl:rotate-180" />
+                </Link>
+              </>
+            ) : (
+              // pre-mount placeholder keeps layout stable
+              <div className="w-32 h-11" aria-hidden="true" />
             )}
           </div>
 
           {/* MOBILE TOGGLE */}
-          <button 
-            onClick={() => setIsOpen(true)}
-            className="lg:hidden p-4 border-2 border-black rounded-2xl bg-gray-50 active:bg-yellow-400 transition-all"
-          >
-            <Menu size={24} strokeWidth={4} />
-          </button>
+          <div className="lg:hidden flex items-center gap-2">
+            {authed && (
+              <Link href="/cart" aria-label="Cart" className="relative flex items-center justify-center w-12 h-12 border-2 border-black dark:border-neutral-700 rounded-2xl bg-gray-50 dark:bg-neutral-900">
+                <ShoppingCart size={20} strokeWidth={3} className="text-black dark:text-neutral-100" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-blue-600 text-white text-[9px] font-black min-w-5 h-5 px-1 rounded-full flex items-center justify-center border-2 border-white dark:border-neutral-950">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
+            <LanguageSwitcher className="px-2 py-2 border-2 border-black dark:border-neutral-700 rounded-2xl bg-gray-50 dark:bg-neutral-900" />
+            <ThemeToggle />
+            <button
+              onClick={() => setIsOpen(true)}
+              className="p-3.5 border-2 border-black dark:border-neutral-700 rounded-2xl bg-gray-50 dark:bg-neutral-900 active:bg-blue-600 active:text-white transition-all"
+              aria-label="Open menu"
+              aria-expanded={isOpen}
+            >
+              <Menu size={22} strokeWidth={3.5} aria-hidden="true" className="text-black dark:text-neutral-100" />
+            </button>
+          </div>
         </div>
       </div>
 
       {/* MOBILE OVERLAY MENU */}
-      <div className={`fixed inset-0 bg-white z-[200] transition-transform duration-700 ease-[cubic-bezier(0.8,0,0.2,1)] overflow-y-auto ${isOpen ? 'translate-y-0' : '-translate-y-full'}`}>
-        
+      <div
+        className={`lg:hidden fixed inset-0 bg-white dark:bg-neutral-950 z-[200] flex flex-col transition-transform duration-500 ease-[cubic-bezier(0.7,0,0.2,1)] ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        role="dialog"
+        aria-modal="true"
+      >
         {/* MOBILE HEADER */}
-        <div className="sticky top-0 bg-white flex justify-between items-center p-6 border-b-4 border-black z-[210]">
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-blue-600 rounded-full animate-pulse" />
-            <span className="text-[11px] font-black uppercase tracking-[0.4em] text-black">Security Protocol</span>
-          </div>
-          <button 
+        <div className="shrink-0 bg-white dark:bg-neutral-950 flex justify-between items-center px-6 h-20 border-b-4 border-black dark:border-neutral-800">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="bg-blue-600 text-white p-2 rounded-xl">
+              <Zap size={18} fill="currentColor" />
+            </div>
+            <span className="text-2xl font-black uppercase tracking-tighter italic text-black dark:text-neutral-100">HiGc<span className="text-blue-600">.</span></span>
+          </Link>
+          <button
             onClick={() => setIsOpen(false)}
-            className="p-5 bg-black text-white rounded-2xl border-2 border-black active:scale-90 transition-transform"
+            className="p-3.5 bg-black dark:bg-white text-white dark:text-black rounded-2xl active:scale-90 transition-transform"
+            aria-label="Close menu"
           >
-            <X size={26} strokeWidth={3} />
+            <X size={22} strokeWidth={3} aria-hidden="true" />
           </button>
         </div>
 
-        {/* MOBILE CONTENT */}
-        <div className="p-8 pb-32 space-y-12">
+        {/* MOBILE CONTENT (scrolls) */}
+        <div className="flex-1 overflow-y-auto px-6 py-7 space-y-8">
+
+          {/* Account card OR sign-in CTAs */}
+          {authed ? (
+            <Link href="/dashboard" className="flex items-center gap-4 p-4 rounded-3xl border-4 border-black dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-none active:translate-x-1 active:translate-y-1 active:shadow-none transition-all">
+              <span className="w-14 h-14 shrink-0 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-2xl">{initial}</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-lg font-black uppercase tracking-tight text-black dark:text-neutral-100 truncate leading-tight">{user?.first_name || t('nav.account')}</p>
+                <p className="text-xs text-gray-500 dark:text-neutral-400 truncate">{user?.email}</p>
+                <span className={`inline-flex items-center gap-1 mt-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${user?.email_verified ? 'bg-green-100 dark:bg-green-950/50 text-green-700 dark:text-green-300' : 'bg-yellow-100 dark:bg-yellow-950/50 text-yellow-700 dark:text-yellow-300'}`}>
+                  {user?.email_verified ? <CheckCircle2 size={10} /> : <AlertCircle size={10} />}
+                  {user?.email_verified ? t('nav.verified') : t('nav.unverified')}
+                </span>
+              </div>
+              <ChevronRight size={22} className="text-gray-300 dark:text-neutral-600 shrink-0" />
+            </Link>
+          ) : mounted ? (
+            <div className="grid grid-cols-2 gap-3">
+              <Link href="/login" className="py-5 rounded-2xl border-4 border-black dark:border-neutral-700 bg-white dark:bg-neutral-900 text-black dark:text-neutral-100 font-black uppercase text-xs tracking-widest text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-none active:translate-x-1 active:translate-y-1 active:shadow-none transition-all">
+                {t('nav.login')}
+              </Link>
+              <Link href="/register" className="py-5 rounded-2xl border-4 border-blue-600 bg-blue-600 text-white font-black uppercase text-xs tracking-widest text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-none active:translate-x-1 active:translate-y-1 active:shadow-none transition-all">
+                {t('nav.signup')}
+              </Link>
+            </div>
+          ) : null}
+
+          {/* Primary navigation */}
           <div>
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.5em] mb-8 text-left border-l-4 border-blue-600 pl-3">Main Terminals</p>
-            <div className="grid grid-cols-1 gap-6">
-              {mainLinks.map((link, i) => (
-                <Link 
-                  key={link.href} 
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex justify-between items-center border-b-4 border-black pb-5 text-left"
-                >
-                  <div className="flex items-center gap-5">
-                    <span className="text-sm font-black text-blue-600 opacity-40 italic">0{i+1}</span>
-                    <span className="text-5xl font-black uppercase italic tracking-tighter group-hover:text-blue-600 transition-colors">
-                      {link.name}
+            <p className="text-[9px] font-black text-gray-400 dark:text-neutral-500 uppercase tracking-[0.4em] mb-4 border-l-4 border-blue-600 pl-3">{t('nav.navigate')}</p>
+            <div className="space-y-2.5">
+              {mainLinks.map((link, i) => {
+                const Icon = link.icon;
+                const active = isActive(link.href);
+                const isGated = gated(link);
+                return (
+                  <Link
+                    key={link.href}
+                    href={hrefFor(link)}
+                    className={`group flex items-center gap-4 p-4 rounded-2xl border-2 transition-all ${
+                      active
+                        ? 'border-blue-600 bg-blue-600 text-white'
+                        : 'border-black dark:border-neutral-800 bg-white dark:bg-neutral-900 text-black dark:text-neutral-100 active:border-blue-600'
+                    }`}
+                  >
+                    <span className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${active ? 'bg-white/20' : 'bg-gray-100 dark:bg-neutral-800'}`}>
+                      <Icon size={20} strokeWidth={2.5} />
                     </span>
-                  </div>
-                  <ArrowUpRight size={32} className="opacity-10 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                </Link>
-              ))}
+                    <span className="text-2xl font-black uppercase italic tracking-tighter flex-1">{link.name}</span>
+                    {isGated ? (
+                      <span className="flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-gray-400 dark:text-neutral-500">
+                        <Lock size={13} strokeWidth={3} /> {t('nav.loginTag')}
+                      </span>
+                    ) : (
+                      <>
+                        <span className={`text-xs font-black italic ${active ? 'text-white/50' : 'text-blue-600/40'}`}>0{i + 1}</span>
+                        <ArrowUpRight size={22} className={`transition-all ${active ? 'opacity-80' : 'opacity-20 group-hover:opacity-100'}`} />
+                      </>
+                    )}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
-          <div className="bg-gray-50 p-8 rounded-[40px] border-4 border-black shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]">
-            <p className="text-[9px] font-black text-blue-600 uppercase tracking-[0.5em] mb-8 text-left">Dashboard Sub-Node</p>
-            <div className="grid grid-cols-2 gap-4">
-              {dashboardLinks.map((link) => (
-                <Link 
-                  key={link.href} 
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`p-5 rounded-2xl border-2 border-black font-black uppercase text-[10px] tracking-widest text-center transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none ${
-                    pathname === link.href ? 'bg-blue-600 text-white border-blue-600' : 'bg-white'
-                  }`}
-                >
-                  {link.name}
+          {/* Account area (only when signed in) */}
+          {authed && (
+            <div>
+              <p className="text-[9px] font-black text-gray-400 dark:text-neutral-500 uppercase tracking-[0.4em] mb-4 border-l-4 border-blue-600 pl-3">{t('nav.myAccount')}</p>
+
+              {isStaff && (
+                <Link href="/admin" className="flex items-center gap-3 p-4 mb-3 rounded-2xl border-2 border-blue-600 bg-blue-600 text-white font-black uppercase text-xs tracking-widest">
+                  <Shield size={18} strokeWidth={3} /> {t('nav.admin')} {t('nav.dashboard')} <ArrowUpRight size={18} className="ml-auto rtl:rotate-180" />
                 </Link>
-              ))}
+              )}
+
+              <div className="grid grid-cols-2 gap-3">
+                {dashboardLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`flex items-center justify-center p-4 rounded-2xl border-2 font-black uppercase text-[11px] tracking-widest text-center transition-all ${
+                      pathname === link.href
+                        ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
+                        : 'bg-white dark:bg-neutral-900 text-black dark:text-neutral-100 border-black dark:border-neutral-800 active:border-blue-600'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
-        <div className="fixed bottom-0 left-0 w-full p-8 bg-white border-t-4 border-black">
-           <button 
-             onClick={async () => {
-               await logout();
-               setIsOpen(false);
-             }}
-             className="w-full bg-red-500 text-white py-6 rounded-[24px] border-4 border-black font-black uppercase text-sm tracking-widest shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
-           >
-             Terminate Session
-           </button>
-        </div>
+        {/* Sticky footer action */}
+        {authed && (
+          <div className="shrink-0 p-6 bg-white dark:bg-neutral-950 border-t-4 border-black dark:border-neutral-800">
+            <button
+              onClick={async () => { await logout(); setIsOpen(false); }}
+              className="w-full flex items-center justify-center gap-3 bg-red-500 text-white py-5 rounded-2xl border-4 border-black dark:border-red-900 font-black uppercase text-sm tracking-widest shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-none active:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
+            >
+              <LogOut size={18} strokeWidth={3} /> {t('nav.signOut')}
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );

@@ -5,6 +5,7 @@ import { MessageSquare, Plus, Send, CheckCircle2, Clock, AlertCircle, X } from "
 import { supportAPI } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
+import { useI18n } from '@/lib/i18n';
 
 interface SupportMessage {
   id: number;
@@ -26,8 +27,10 @@ interface SupportTicket {
 }
 
 export default function SupportPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,14 +40,16 @@ export default function SupportPage() {
   const [newSubject, setNewSubject] = useState('');
   const [newMessage, setNewMessage] = useState('');
   const [messageText, setMessageText] = useState('');
+  const [createError, setCreateError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!isInitialized) return;
     if (!isAuthenticated) {
       router.push('/login?redirect=/dashboard/support');
       return;
     }
     loadTickets();
-  }, [isAuthenticated, router]);
+  }, [isInitialized, isAuthenticated, router]);
 
   const loadTickets = async () => {
     try {
@@ -70,22 +75,28 @@ export default function SupportPage() {
 
   const handleCreateTicket = async () => {
     if (!newSubject.trim() || !newMessage.trim()) return;
-    
+
+    setCreateError(null);
     setCreating(true);
     try {
+      // The backend creates the ticket AND its first message from this one call.
       const response = await supportAPI.create({
         subject: newSubject,
         priority: 'medium',
+        message: newMessage,
       });
-      // Add initial message
-      await supportAPI.addMessage(response.data.id, newMessage);
       await loadTickets();
       await loadTicket(response.data.id);
       setShowCreateForm(false);
       setNewSubject('');
       setNewMessage('');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create ticket:', error);
+      setCreateError(
+        error.response?.data?.message ||
+          error.response?.data?.detail ||
+          t('support.createError')
+      );
     } finally {
       setCreating(false);
     }
@@ -109,13 +120,13 @@ export default function SupportPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'resolved':
-        return 'bg-green-50 text-green-600 border-green-200';
+        return 'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-300 border-green-200';
       case 'in_progress':
-        return 'bg-blue-50 text-blue-600 border-blue-200';
+        return 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 border-blue-200';
       case 'closed':
-        return 'bg-gray-50 text-gray-600 border-gray-200';
+        return 'bg-gray-50 dark:bg-neutral-800 text-gray-600 dark:text-neutral-300 border-gray-200 dark:border-neutral-700';
       default:
-        return 'bg-orange-50 text-orange-600 border-orange-200';
+        return 'bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-300 border-orange-200';
     }
   };
 
@@ -132,12 +143,12 @@ export default function SupportPage() {
     }
   };
 
-  if (!isAuthenticated || loading) {
+  if (!isInitialized || !isAuthenticated || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0b] flex items-center justify-center">
         <div className="animate-pulse text-center">
           <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4" />
-          <p className="text-gray-400 font-bold uppercase tracking-widest">Loading...</p>
+          <p className="text-gray-400 dark:text-neutral-500 font-bold uppercase tracking-widest">{t('support.loading')}</p>
         </div>
       </div>
     );
@@ -150,10 +161,10 @@ export default function SupportPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-            Support<span className="text-blue-600">.</span>
+            {t('support.heading')}<span className="text-blue-600">.</span>
           </h1>
-          <p className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-[0.4em] mt-2">
-            Get help with your orders
+          <p className="text-[10px] md:text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-[0.4em] mt-2">
+            {t('support.subtitle')}
           </p>
         </div>
         <button
@@ -161,41 +172,44 @@ export default function SupportPage() {
           className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2"
         >
           <Plus size={16} />
-          New Ticket
+          {t('support.newTicket')}
         </button>
       </div>
 
       {/* CREATE FORM */}
       {showCreateForm && (
-        <div className="bg-white border border-gray-100 rounded-[32px] p-6 md:p-8 space-y-4">
-          <h2 className="text-xl font-black uppercase">Create Support Ticket</h2>
+        <div className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-[32px] p-6 md:p-8 space-y-4">
+          <h2 className="text-xl font-black uppercase">{t('support.createTicketTitle')}</h2>
           <div>
-            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Subject</label>
+            <label className="text-[9px] font-black text-gray-400 dark:text-neutral-500 uppercase tracking-widest mb-2 block">{t('support.subjectLabel')}</label>
             <input
               type="text"
               value={newSubject}
               onChange={(e) => setNewSubject(e.target.value)}
-              placeholder="What can we help you with?"
-              className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3 px-4 outline-none focus:border-blue-600"
+              placeholder={t('support.subjectPlaceholder')}
+              className="w-full bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-2xl py-3 px-4 outline-none focus:border-blue-600 dark:text-neutral-100"
             />
           </div>
           <div>
-            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Message</label>
+            <label className="text-[9px] font-black text-gray-400 dark:text-neutral-500 uppercase tracking-widest mb-2 block">{t('support.messageLabel')}</label>
             <textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Describe your issue..."
+              placeholder={t('support.messagePlaceholder')}
               rows={4}
-              className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3 px-4 outline-none focus:border-blue-600 resize-none"
+              className="w-full bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-2xl py-3 px-4 outline-none focus:border-blue-600 dark:text-neutral-100 resize-none"
             />
           </div>
+          {createError && (
+            <p role="alert" className="text-sm font-bold text-red-600">{createError}</p>
+          )}
           <div className="flex gap-3">
             <button
               onClick={handleCreateTicket}
               disabled={creating || !newSubject.trim() || !newMessage.trim()}
               className="flex-1 bg-blue-600 text-white py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 disabled:opacity-50 transition-all"
             >
-              {creating ? 'Creating...' : 'Create Ticket'}
+              {creating ? t('support.creating') : t('support.createTicketButton')}
             </button>
             <button
               onClick={() => {
@@ -203,9 +217,9 @@ export default function SupportPage() {
                 setNewSubject('');
                 setNewMessage('');
               }}
-              className="px-6 py-3 bg-gray-100 text-gray-600 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-gray-200 transition-all"
+              className="px-6 py-3 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-300 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all"
             >
-              Cancel
+              {t('support.cancel')}
             </button>
           </div>
         </div>
@@ -216,19 +230,19 @@ export default function SupportPage() {
         {/* LEFT: TICKET LIST */}
         <div className="lg:col-span-1 space-y-3">
           {tickets.length === 0 ? (
-            <div className="bg-white border border-gray-100 rounded-[32px] p-8 text-center">
-              <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-sm text-gray-400 font-bold">No support tickets yet</p>
+            <div className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-[32px] p-8 text-center">
+              <MessageSquare className="w-12 h-12 text-gray-300 dark:text-neutral-600 mx-auto mb-4" />
+              <p className="text-sm text-gray-400 dark:text-neutral-500 font-bold">{t('support.noTickets')}</p>
             </div>
           ) : (
             tickets.map((ticket) => (
               <button
                 key={ticket.id}
                 onClick={() => loadTicket(ticket.id)}
-                className={`w-full text-left bg-white border rounded-[24px] p-4 transition-all ${
+                className={`w-full text-left bg-white dark:bg-neutral-900 border rounded-[24px] p-4 transition-all ${
                   selectedTicket?.id === ticket.id
                     ? 'border-blue-600 shadow-lg'
-                    : 'border-gray-100 hover:border-gray-200'
+                    : 'border-gray-100 dark:border-neutral-800 hover:border-gray-200 dark:hover:border-neutral-700'
                 }`}
               >
                 <div className="flex items-start justify-between mb-2">
@@ -238,12 +252,12 @@ export default function SupportPage() {
                     {ticket.status}
                   </span>
                 </div>
-                <p className="text-[9px] text-gray-400 font-bold uppercase">
+                <p className="text-[9px] text-gray-400 dark:text-neutral-500 font-bold uppercase">
                   {new Date(ticket.created_at).toLocaleDateString()}
                 </p>
                 {ticket.messages && ticket.messages.length > 0 && (
-                  <p className="text-[9px] text-gray-500 mt-1">
-                    {ticket.messages.length} message{ticket.messages.length !== 1 ? 's' : ''}
+                  <p className="text-[9px] text-gray-500 dark:text-neutral-400 mt-1">
+                    {ticket.messages.length} {ticket.messages.length !== 1 ? t('support.messagesPlural') : t('support.messageSingular')}
                   </p>
                 )}
               </button>
@@ -254,17 +268,17 @@ export default function SupportPage() {
         {/* RIGHT: MESSAGE VIEW */}
         <div className="lg:col-span-2">
           {selectedTicket ? (
-            <div className="bg-white border border-gray-100 rounded-[32px] p-6 md:p-8 space-y-6 flex flex-col h-[600px]">
+            <div className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-[32px] p-6 md:p-8 space-y-6 flex flex-col h-[600px]">
               {/* HEADER */}
-              <div className="border-b border-gray-100 pb-4">
+              <div className="border-b border-gray-100 dark:border-neutral-800 pb-4">
                 <h2 className="text-xl font-black uppercase mb-2">{selectedTicket.subject}</h2>
                 <div className="flex items-center gap-3">
                   <span className={`text-[8px] font-black px-2 py-1 rounded-full border flex items-center gap-1 ${getStatusColor(selectedTicket.status)}`}>
                     {getStatusIcon(selectedTicket.status)}
                     {selectedTicket.status}
                   </span>
-                  <span className="text-[9px] text-gray-400 font-bold uppercase">
-                    Created {new Date(selectedTicket.created_at).toLocaleDateString()}
+                  <span className="text-[9px] text-gray-400 dark:text-neutral-500 font-bold uppercase">
+                    {t('support.created')} {new Date(selectedTicket.created_at).toLocaleDateString()}
                   </span>
                 </div>
               </div>
@@ -277,34 +291,34 @@ export default function SupportPage() {
                       key={msg.id}
                       className={`p-4 rounded-2xl ${
                         msg.is_admin
-                          ? 'bg-blue-50 border border-blue-100 ml-8'
-                          : 'bg-gray-50 border border-gray-100 mr-8'
+                          ? 'bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900 ml-8'
+                          : 'bg-gray-50 dark:bg-neutral-800 border border-gray-100 dark:border-neutral-800 mr-8'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-[9px] font-black uppercase text-gray-600">
-                          {msg.is_admin ? 'Support Team' : 'You'}
+                        <p className="text-[9px] font-black uppercase text-gray-600 dark:text-neutral-300">
+                          {msg.is_admin ? t('support.supportTeam') : t('support.you')}
                         </p>
-                        <p className="text-[8px] text-gray-400">
+                        <p className="text-[8px] text-gray-400 dark:text-neutral-500">
                           {new Date(msg.created_at).toLocaleString()}
                         </p>
                       </div>
-                      <p className="text-sm text-gray-900 whitespace-pre-wrap">{msg.message}</p>
+                      <p className="text-sm text-gray-900 dark:text-neutral-100 whitespace-pre-wrap">{msg.message}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-gray-400 text-center py-8">No messages yet</p>
+                  <p className="text-sm text-gray-400 dark:text-neutral-500 text-center py-8">{t('support.noMessages')}</p>
                 )}
               </div>
 
               {/* MESSAGE INPUT */}
-              <div className="border-t border-gray-100 pt-4 space-y-3">
+              <div className="border-t border-gray-100 dark:border-neutral-800 pt-4 space-y-3">
                 <textarea
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
-                  placeholder="Type your message..."
+                  placeholder={t('support.replyPlaceholder')}
                   rows={3}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3 px-4 outline-none focus:border-blue-600 resize-none"
+                  className="w-full bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-2xl py-3 px-4 outline-none focus:border-blue-600 dark:text-neutral-100 resize-none"
                 />
                 <button
                   onClick={handleSendMessage}
@@ -312,14 +326,14 @@ export default function SupportPage() {
                   className="w-full bg-blue-600 text-white py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                 >
                   <Send size={16} />
-                  {sending ? 'Sending...' : 'Send Message'}
+                  {sending ? t('support.sending') : t('support.sendMessage')}
                 </button>
               </div>
             </div>
           ) : (
-            <div className="bg-white border border-gray-100 rounded-[32px] p-12 text-center">
-              <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-sm text-gray-400 font-bold">Select a ticket to view messages</p>
+            <div className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-[32px] p-12 text-center">
+              <MessageSquare className="w-16 h-16 text-gray-300 dark:text-neutral-600 mx-auto mb-4" />
+              <p className="text-sm text-gray-400 dark:text-neutral-500 font-bold">{t('support.selectTicket')}</p>
             </div>
           )}
         </div>

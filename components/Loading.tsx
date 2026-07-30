@@ -30,7 +30,7 @@ export default function Loading({
       {/* MAIN LOADER */}
       <div className="relative">
         {/* OUTER ROTATING RING */}
-        <div className={`${sizeClasses[size]} border-4 border-gray-200 rounded-2xl animate-spin`} style={{ 
+        <div className={`${sizeClasses[size]} border-4 border-gray-200 dark:border-neutral-700 rounded-2xl animate-spin`} style={{
           borderTopColor: '#2563eb',
           borderRightColor: '#2563eb',
           animationDuration: '1s'
@@ -57,7 +57,7 @@ export default function Loading({
       {/* LOADING TEXT */}
       {message && (
         <div className="text-center space-y-2">
-          <p className="text-sm md:text-base font-black uppercase tracking-widest text-gray-900">
+          <p className="text-sm md:text-base font-black uppercase tracking-widest text-gray-900 dark:text-neutral-100">
             {message}
           </p>
           <div className="flex items-center justify-center gap-1">
@@ -79,7 +79,7 @@ export default function Loading({
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 z-[9999] bg-white flex items-center justify-center">
+      <div className="fixed inset-0 z-[9999] bg-white dark:bg-[#0a0a0b] flex items-center justify-center">
         <div className="relative">
           {content}
         </div>
@@ -105,7 +105,7 @@ export function BrutalistLoader({ fullScreen = false, message }: { fullScreen?: 
         {[0, 1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="w-4 h-16 bg-blue-600 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+            className="w-4 h-16 bg-blue-600 border-2 border-black dark:border-neutral-700 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-none"
             style={{
               animation: `brutalistPulse 1.2s ease-in-out infinite`,
               animationDelay: `${i * 0.15}s`,
@@ -116,18 +116,18 @@ export function BrutalistLoader({ fullScreen = false, message }: { fullScreen?: 
 
       {/* BRAND TEXT */}
       <div className="flex items-center gap-3">
-        <div className="bg-blue-600 text-white p-2 rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] animate-pulse">
+        <div className="bg-blue-600 text-white p-2 rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-none animate-pulse">
           <Zap size={20} fill="currentColor" />
         </div>
         <div className="flex items-baseline gap-0.5">
-          <span className="text-2xl font-black uppercase tracking-tighter italic leading-none text-black">HiGc</span>
+          <span className="text-2xl font-black uppercase tracking-tighter italic leading-none text-black dark:text-neutral-100">HiGc</span>
           <span className="text-blue-600 font-black text-2xl leading-none">.</span>
         </div>
       </div>
 
       {/* LOADING TEXT */}
       {message && (
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 dark:text-neutral-400">
           {message}
         </p>
       )}
@@ -143,7 +143,7 @@ export function BrutalistLoader({ fullScreen = false, message }: { fullScreen?: 
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 z-[9999] bg-white flex items-center justify-center">
+      <div className="fixed inset-0 z-[9999] bg-white dark:bg-[#0a0a0b] flex items-center justify-center">
         {content}
       </div>
     );

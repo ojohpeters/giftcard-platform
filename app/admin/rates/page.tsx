@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { Plus, X, Save, Edit2, Trash2, Zap, ZapOff, TrendingUp } from "lucide-react";
+import { formatIRRShort } from '@/lib/currency';
 
 export default function RatesPage() {
   // 1. STATE FOR RATES DATA
@@ -42,7 +43,7 @@ export default function RatesPage() {
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-4xl font-black tracking-tighter uppercase italic leading-none">Global Rates</h1>
-          <p className="text-gray-500 font-medium mt-2 uppercase text-[10px] tracking-widest">Adjust Profit Margins & Asset Value</p>
+          <p className="text-gray-500 dark:text-neutral-400 font-medium mt-2 uppercase text-[10px] tracking-widest">Adjust Profit Margins & Asset Value</p>
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
@@ -56,28 +57,28 @@ export default function RatesPage() {
 
       {/* ADD NEW RATE FORM */}
       {isAdding && (
-        <div className="bg-white border-4 border-black p-8 rounded-[40px] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] animate-in slide-in-from-top-4">
+        <div className="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-700 p-8 rounded-[40px] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-none animate-in slide-in-from-top-4">
           <h2 className="text-xl font-black uppercase italic mb-6 flex items-center gap-2">
             <TrendingUp className="text-blue-600" /> New Currency Pair
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <input 
               placeholder="Asset (e.g. Vanilla)" 
-              className="border-2 border-black p-4 rounded-2xl font-black outline-none bg-gray-50"
+              className="border-2 border-black p-4 rounded-2xl font-black outline-none bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-100"
               value={newRate.type}
               onChange={(e) => setNewRate({...newRate, type: e.target.value})}
             />
             <input 
               type="number" 
-              placeholder="Buy Rate (IQD)" 
-              className="border-2 border-black p-4 rounded-2xl font-black outline-none bg-gray-50"
+              placeholder="Buy Rate (تومان)" 
+              className="border-2 border-black p-4 rounded-2xl font-black outline-none bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-100"
               value={newRate.buy}
               onChange={(e) => setNewRate({...newRate, buy: e.target.value})}
             />
             <input 
               type="number" 
-              placeholder="Sell Rate (IQD)" 
-              className="border-2 border-black p-4 rounded-2xl font-black outline-none bg-gray-50"
+              placeholder="Sell Rate (تومان)" 
+              className="border-2 border-black p-4 rounded-2xl font-black outline-none bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-100"
               value={newRate.sell}
               onChange={(e) => setNewRate({...newRate, sell: e.target.value})}
             />
@@ -92,34 +93,34 @@ export default function RatesPage() {
       )}
 
       {/* RATE TABLE */}
-      <div className="bg-white border-2 border-black rounded-[40px] overflow-hidden shadow-[16px_16px_0px_0px_rgba(240,240,240,1)]">
+      <div className="bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-700 rounded-[40px] overflow-hidden shadow-[16px_16px_0px_0px_rgba(240,240,240,1)] dark:shadow-none">
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b-2 border-black text-[10px] font-black uppercase tracking-[0.3em] bg-gray-50 text-gray-400">
+            <tr className="border-b-2 border-black dark:border-neutral-700 text-[10px] font-black uppercase tracking-[0.3em] bg-gray-50 dark:bg-neutral-800 text-gray-400 dark:text-neutral-500">
               <th className="p-8">Asset/Currency</th>
-              <th className="p-8">Our Buy (IQD)</th>
-              <th className="p-8">Our Sell (IQD)</th>
+              <th className="p-8">Our Buy (تومان)</th>
+              <th className="p-8">Our Sell (تومان)</th>
               <th className="p-8">System Status</th>
               <th className="p-8 text-right">Settings</th>
             </tr>
           </thead>
-          <tbody className="bg-white">
+          <tbody className="bg-white dark:bg-neutral-900">
             {rates.map((rate) => (
-              <tr key={rate.id} className="border-b border-gray-100 hover:bg-blue-50/20 transition-colors group">
+              <tr key={rate.id} className="border-b border-gray-100 dark:border-neutral-800 hover:bg-blue-50/20 dark:hover:bg-blue-950/20 transition-colors group">
                 <td className="p-8 font-black italic text-lg uppercase">
                   {rate.currency} <span className="text-blue-600">/</span> {rate.type}
                 </td>
                 <td className="p-8">
-                  <span className="font-black text-xl tabular-nums italic text-green-600">{formatIQDShort(rate.buy)} IQD</span>
+                  <span className="font-black text-xl tabular-nums italic text-green-600">{formatIRRShort(rate.buy)} تومان</span>
                 </td>
                 <td className="p-8">
-                  <span className="font-black text-xl tabular-nums italic text-blue-600">{formatIQDShort(rate.sell)} IQD</span>
+                  <span className="font-black text-xl tabular-nums italic text-blue-600">{formatIRRShort(rate.sell)} تومان</span>
                 </td>
                 <td className="p-8">
                   <button 
                     onClick={() => toggleStatus(rate.id)}
                     className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${
-                      rate.status === "Active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                      rate.status === "Active" ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300" : "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300"
                     }`}
                   >
                     {rate.status === "Active" ? <Zap size={10} fill="currentColor"/> : <ZapOff size={10}/>}
@@ -128,12 +129,12 @@ export default function RatesPage() {
                 </td>
                 <td className="p-8 text-right">
                   <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="p-3 bg-gray-50 text-gray-400 hover:text-black hover:border-black border border-transparent rounded-xl transition-all">
+                    <button className="p-3 bg-gray-50 dark:bg-neutral-800 text-gray-400 dark:text-neutral-500 hover:text-black dark:hover:text-neutral-100 hover:border-black dark:hover:border-neutral-700 border border-transparent rounded-xl transition-all">
                       <Edit2 size={16} />
                     </button>
                     <button 
                       onClick={() => setRates(rates.filter(r => r.id !== rate.id))}
-                      className="p-3 bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                      className="p-3 bg-gray-50 dark:bg-neutral-800 text-gray-400 dark:text-neutral-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xl transition-all"
                     >
                       <Trash2 size={16} />
                     </button>

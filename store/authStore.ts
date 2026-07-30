@@ -1,11 +1,14 @@
 import { create } from 'zustand';
 import { authAPI } from '@/lib/api';
+import { resetRefreshState } from '@/lib/api';
 
 interface User {
   id: number;
   email: string;
   first_name: string;
   last_name: string;
+  phone_number?: string;
+  email_verified?: boolean;
   referral_code?: string;
   is_staff?: boolean;
   is_superuser?: boolean;
@@ -17,7 +20,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   isInitialized: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, captchaToken?: string) => Promise<void>;
   register: (data: any) => Promise<void>;
   logout: () => Promise<void>;
   fetchUser: () => Promise<void>;
@@ -63,15 +66,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
   
-  login: async (email: string, password: string) => {
+  login: async (email: string, password: string, captchaToken?: string) => {
     set({ isLoading: true });
     try {
-      const response = await authAPI.login(email, password);
+      const response = await authAPI.login(email, password, captchaToken);
       const { tokens } = response.data;
       if (tokens && typeof window !== 'undefined') {
         localStorage.setItem('access_token', tokens.access);
         localStorage.setItem('refresh_token', tokens.refresh);
       }
+      // Reset refresh state for new session
+      resetRefreshState();
       // Fetch user to get updated user data including is_staff
       await get().fetchUser();
       set({ isAuthenticated: true, isLoading: false, isInitialized: true });
@@ -84,14 +89,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   register: async (data: any) => {
     set({ isLoading: true });
     try {
-      const response = await authAPI.register(data);
-      const { tokens } = response.data;
-      if (tokens && typeof window !== 'undefined') {
-        localStorage.setItem('access_token', tokens.access);
-        localStorage.setItem('refresh_token', tokens.refresh);
-      }
-      await get().fetchUser();
-      set({ isAuthenticated: true, isLoading: false });
+      // Registration no longer authenticates the user — they must verify their
+      // email first, then log in. So we do NOT store tokens or set
+      // isAuthenticated here; the register page shows a "check your email" view.
+      await authAPI.register(data);
+      set({ isLoading: false });
     } catch (error: any) {
       set({ isLoading: false });
       throw error;
@@ -130,3 +132,4 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ user: userData });
   },
 }));
+

@@ -1,5 +1,6 @@
 "use client";
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { 
   LayoutGrid, 
   History, 
@@ -7,25 +8,76 @@ import {
   Settings, 
   LogOut, 
   Wallet,
-  MessageSquare
+  MessageSquare,
+  Gift,
+  Upload
 } from "lucide-react";
 import { useAuthStore } from '@/store/authStore';
+import { userAPI } from '@/lib/api';
 import Link from 'next/link';
+import { formatIRRShort } from '@/lib/currency';
+import { useI18n } from '@/lib/i18n';
+
+function NavLink({ href, icon: Icon, label }: { href: string; icon: any; label: string }) {
+  const pathname = usePathname();
+  const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
+  
+  return (
+    <Link 
+      href={href} 
+      className={`flex items-center gap-4 px-3 py-2 text-sm font-bold transition-all group ${
+        isActive
+          ? 'text-gray-900 dark:text-neutral-100 bg-gray-50 dark:bg-neutral-900 rounded-xl'
+          : 'text-gray-400 dark:text-neutral-500 hover:text-gray-900 dark:hover:text-neutral-100'
+      }`}
+    >
+      <Icon size={18} className={isActive ? 'text-blue-600' : 'group-hover:text-gray-900 dark:group-hover:text-neutral-100'} />
+      {label}
+    </Link>
+  );
+}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n();
   const router = useRouter();
+  const pathname = usePathname();
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
+  const initialize = useAuthStore((state) => state.initialize);
+  const [wallet, setWallet] = useState<{ balance: string } | null>(null);
+
+  // Initialize auth on mount
+  useEffect(() => {
+    if (!isInitialized && typeof window !== 'undefined') {
+      initialize();
+    }
+  }, [initialize, isInitialized]);
+
+  // Fetch wallet balance
+  useEffect(() => {
+    if (user && isInitialized) {
+      const fetchWallet = async () => {
+        try {
+          const response = await userAPI.getWallet();
+          setWallet(response.data);
+        } catch (error) {
+          console.error('Failed to fetch wallet:', error);
+        }
+      };
+      fetchWallet();
+    }
+  }, [user, isInitialized]);
 
   const handleLogout = async () => {
     await logout();
     router.push('/');
   };
   return (
-    <div className="flex min-h-screen bg-white font-sans selection:bg-blue-50">
+    <div className="flex min-h-screen bg-white dark:bg-[#0a0a0b] font-sans selection:bg-blue-50">
       
       {/* SIDEBAR - ICON CENTRIC & SLEEK */}
-      <aside className="w-64 bg-white border-r border-gray-100 hidden lg:flex flex-col p-8 sticky top-0 h-screen">
+      <aside className="w-64 bg-white dark:bg-neutral-900 border-r border-gray-100 dark:border-neutral-800 hidden lg:flex flex-col p-8 sticky top-0 h-screen">
         
         {/* TOP SPACER (Logo Removed) */}
         <div className="h-10 mb-12"></div>
@@ -33,66 +85,53 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <nav className="flex-1 space-y-12">
           {/* Operations Group */}
           <div className="space-y-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-300 ml-1">Main</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-300 dark:text-neutral-600 ml-1">{t('dashNav.main')}</p>
             <div className="space-y-1">
-              <a href="/dashboard" className="flex items-center gap-4 px-3 py-2 text-sm font-bold text-gray-900 bg-gray-50 rounded-xl group">
-                <LayoutGrid size={18} className="text-blue-600" />
-                Overview
-              </a>
-              <a href="/dashboard/orders" className="flex items-center gap-4 px-3 py-2 text-sm font-bold text-gray-400 hover:text-gray-900 transition-all group">
-                <History size={18} className="group-hover:text-gray-900" />
-                History
-              </a>
-              <a href="/dashboard/support" className="flex items-center gap-4 px-3 py-2 text-sm font-bold text-gray-400 hover:text-gray-900 transition-all group">
-                <MessageSquare size={18} className="group-hover:text-gray-900" />
-                Support
-              </a>
+              <NavLink href="/dashboard" icon={LayoutGrid} label={t('dashNav.overview')} />
+              <NavLink href="/dashboard/orders" icon={History} label={t('dashNav.history')} />
+              <NavLink href="/dashboard/submissions" icon={Upload} label={t('dashNav.submissions')} />
+              <NavLink href="/dashboard/support" icon={MessageSquare} label={t('dashNav.support')} />
+              <NavLink href="/dashboard/codes" icon={Gift} label={t('dashNav.giftCodes')} />
             </div>
           </div>
           
           {/* Finance Group */}
           <div className="space-y-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-300 ml-1">Finance</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-300 dark:text-neutral-600 ml-1">{t('dashNav.finance')}</p>
             <div className="space-y-1">
-              <a href="/dashboard/withdraw" className="flex items-center gap-4 px-3 py-2 text-sm font-bold text-gray-400 hover:text-gray-900 transition-all group">
-                <ArrowUpRight size={18} className="group-hover:text-blue-600" />
-                Payout
-              </a>
-              <a href="/dashboard/settings" className="flex items-center gap-4 px-3 py-2 text-sm font-bold text-gray-400 hover:text-gray-900 transition-all group">
-                <Settings size={18} className="group-hover:text-gray-900" />
-                Settings
-              </a>
+              <NavLink href="/dashboard/withdraw" icon={ArrowUpRight} label={t('dashNav.payout')} />
+              <NavLink href="/dashboard/settings" icon={Settings} label={t('dashNav.settings')} />
             </div>
           </div>
         </nav>
 
         {/* BOTTOM SECTION - WALLET & LOGOUT */}
         <div className="space-y-6">
-          <div className="bg-[#fcfcfd] border border-gray-100 p-6 rounded-3xl">
+          <div className="bg-[#fcfcfd] dark:bg-neutral-800 border border-gray-100 dark:border-neutral-800 p-6 rounded-3xl">
             <div className="flex items-center gap-2 mb-3">
-              <Wallet size={14} className="text-gray-400" />
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Balance</p>
+              <Wallet size={14} className="text-gray-400 dark:text-neutral-500" />
+              <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-widest">{t('dashNav.balance')}</p>
             </div>
-            <p className="text-xl font-black text-gray-900 tracking-tighter">
-              ₦0<span className="text-gray-300">.00</span>
+            <p className="text-xl font-black text-gray-900 dark:text-neutral-100 tracking-tighter">
+              {formatIRRShort(wallet?.balance || '0')} تومان
             </p>
-            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+            <p className="text-[9px] text-gray-400 dark:text-neutral-500 font-bold uppercase tracking-widest mt-1">
               {user?.email}
             </p>
           </div>
           
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-4 px-3 py-2 text-sm font-bold text-gray-400 hover:text-red-600 transition-all w-full"
+            className="flex items-center gap-4 px-3 py-2 text-sm font-bold text-gray-400 dark:text-neutral-500 hover:text-red-600 transition-all w-full"
           >
             <LogOut size={18} />
-            Logout
+            {t('dashNav.logout')}
           </button>
         </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <main className="flex-1 bg-[#fcfcfd]/50">
+      <main className="flex-1 bg-[#fcfcfd]/50 dark:bg-[#0a0a0b]">
         <div className="p-8 md:p-16 max-w-5xl mx-auto">
           {children}
         </div>
