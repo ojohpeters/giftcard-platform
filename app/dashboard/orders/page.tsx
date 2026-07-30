@@ -152,6 +152,37 @@ export default function OrdersPage() {
     }
   };
 
+  // Collapse the workflow `status` + `payment_status` into ONE clear,
+  // action-oriented status so users don't see two confusing/contradictory badges.
+  const GREEN = 'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-300 border-green-100';
+  const BLUE = 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 border-blue-100';
+  const AMBER = 'bg-yellow-50 dark:bg-yellow-950/40 text-yellow-600 dark:text-yellow-300 border-yellow-100';
+  const RED = 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-300 border-red-100';
+  const GRAY = 'bg-gray-50 dark:bg-neutral-800 text-gray-600 dark:text-neutral-300 border-gray-100 dark:border-neutral-800';
+
+  const getUnifiedStatus = (r: { status?: string; payment_status?: string }) => {
+    const s = (r.status || '').toLowerCase();
+    const p = (r.payment_status || '').toLowerCase();
+    if (s === 'rejected') return { key: 'stRejected', color: RED, icon: <XCircle size={12} className="text-red-600" /> };
+    if (s === 'cancelled') return { key: 'stCancelled', color: GRAY, icon: <XCircle size={12} className="text-gray-500 dark:text-neutral-400" /> };
+    if (s === 'completed') return { key: 'stCompleted', color: GREEN, icon: <CheckCircle2 size={12} className="text-green-600" /> };
+    if (p === 'paid' || s === 'payment_confirmed' || s === 'processing') return { key: 'stPaid', color: GREEN, icon: <CheckCircle2 size={12} className="text-green-600" /> };
+    if (p === 'failed') return { key: 'stFailed', color: RED, icon: <XCircle size={12} className="text-red-600" /> };
+    if (s === 'approved') return { key: 'stReadyToPay', color: BLUE, icon: <CreditCard size={12} className="text-blue-600" /> };
+    if (s === 'pending') return { key: 'stAwaitingReview', color: AMBER, icon: <Clock size={12} className="text-yellow-600" /> };
+    return { key: '', color: GRAY, icon: <Clock size={12} className="text-gray-600 dark:text-neutral-300" /> };
+  };
+
+  const UnifiedStatusBadge = ({ r }: { r: { status?: string; payment_status?: string } }) => {
+    const st = getUnifiedStatus(r);
+    return (
+      <div className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase border inline-flex items-center gap-1.5 ${st.color}`}>
+        {st.icon}
+        {st.key ? t(`dashOrders.${st.key}`) : (r.status || '').replace(/_/g, ' ')}
+      </div>
+    );
+  };
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
       month: 'short',
@@ -282,13 +313,7 @@ export default function OrdersPage() {
                         <p className="text-xs text-gray-400 dark:text-neutral-500">{t('dashOrders.total')}</p>
                         <p className="font-bold text-green-600">{formatIRRShort(request.total_amount_irr ?? '0')} تومان</p>
                       </div>
-                      <div className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase border flex items-center gap-1.5 ${getStatusColor(request.status)}`}>
-                        {getStatusIcon(request.status)}
-                        {request.status.replace('_', ' ')}
-                      </div>
-                      <div className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase border ${getPaymentStatusColor(request.payment_status)}`}>
-                        {request.payment_status}
-                      </div>
+                      <UnifiedStatusBadge r={request} />
                       {request.status === 'approved' && request.payment_status !== 'paid' && (
                         <button
                           onClick={() => handlePay(request.id)}
@@ -417,17 +442,9 @@ export default function OrdersPage() {
                 <p className="text-[10px] font-bold text-green-600 uppercase mb-1">{t('dashOrders.totalIRR')}</p>
                 <p className="text-lg font-bold text-green-700 dark:text-green-300">{formatIRRShort(selectedRequest.total_amount_irr ?? '0')} تومان</p>
               </div>
-              <div className="bg-gray-50 dark:bg-neutral-800 rounded-xl p-3">
+              <div className="bg-gray-50 dark:bg-neutral-800 rounded-xl p-3 col-span-2">
                 <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('dashOrders.status')}</p>
-                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(selectedRequest.status)}`}>
-                  {selectedRequest.status.replace('_', ' ')}
-                </span>
-              </div>
-              <div className="bg-gray-50 dark:bg-neutral-800 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('dashOrders.payment')}</p>
-                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${getPaymentStatusColor(selectedRequest.payment_status)}`}>
-                  {selectedRequest.payment_status}
-                </span>
+                <UnifiedStatusBadge r={selectedRequest} />
               </div>
             </div>
 
