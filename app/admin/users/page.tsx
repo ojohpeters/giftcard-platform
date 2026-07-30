@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users, Search, Mail, Calendar, Shield, UserCheck, UserX, Filter } from "lucide-react";
+import { Users, Search, Calendar, Shield, UserCheck, UserX, Filter } from "lucide-react";
 import { adminAPI } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 interface User {
@@ -187,10 +187,10 @@ export default function AdminUsersPage() {
       {/* USERS TABLE */}
       <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-[32px] overflow-hidden shadow-lg">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px]">
+          <table className="w-full min-w-[680px]">
             <thead className="bg-gray-50 dark:bg-neutral-800 border-b-2 border-gray-200 dark:border-neutral-700">
               <tr>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">
+                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">
                   <input
                     type="checkbox"
                     checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
@@ -204,19 +204,18 @@ export default function AdminUsersPage() {
                     className="w-5 h-5 rounded border-gray-300 dark:border-neutral-600 text-blue-600 focus:ring-blue-500"
                   />
                 </th>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">User</th>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Email</th>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Status</th>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Role</th>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Joined</th>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Last Login</th>
-                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Actions</th>
+                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">User</th>
+                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Status</th>
+                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Role</th>
+                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Joined</th>
+                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Last Login</th>
+                <th className="text-left px-4 py-4 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="p-12 text-center">
+                  <td colSpan={7} className="p-12 text-center">
                     <Users className="w-16 h-16 text-gray-300 dark:text-neutral-600 mx-auto mb-4" />
                     <p className="text-gray-400 dark:text-neutral-500 font-bold uppercase">No users found</p>
                     <p className="text-[9px] text-gray-400 dark:text-neutral-500 mt-2">User management endpoint needs to be implemented</p>
@@ -225,7 +224,7 @@ export default function AdminUsersPage() {
               ) : (
                 filteredUsers.map((user) => (
                   <tr key={user.id} className="border-b border-gray-100 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
-                    <td className="p-6">
+                    <td className="px-4 py-4">
                       <input
                         type="checkbox"
                         checked={selectedUsers.includes(user.id)}
@@ -239,24 +238,19 @@ export default function AdminUsersPage() {
                         className="w-5 h-5 rounded border-gray-300 dark:border-neutral-600 text-blue-600 focus:ring-blue-500"
                       />
                     </td>
-                    <td className="p-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center text-white font-black italic">
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 shrink-0 bg-gray-900 rounded-xl flex items-center justify-center text-white font-black italic">
                           {user.first_name?.[0]}{user.last_name?.[0]}
                         </div>
-                        <div>
-                          <p className="text-sm font-black">{user.first_name} {user.last_name}</p>
+                        <div className="min-w-0">
+                          <p className="text-sm font-black truncate">{user.first_name} {user.last_name}</p>
+                          <p className="text-xs text-gray-500 dark:text-neutral-400 truncate">{user.email}</p>
                           <p className="text-[9px] text-gray-400 dark:text-neutral-500">ID: {user.id}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="p-6">
-                      <div className="flex items-center gap-2">
-                        <Mail size={14} className="text-gray-400 dark:text-neutral-500" />
-                        <span className="text-sm font-bold">{user.email}</span>
-                      </div>
-                    </td>
-                    <td className="p-6">
+                    <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         {user.email_verified ? (
                           <span className="text-[9px] font-black px-2 py-1 rounded-full bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-300 border border-green-200 dark:border-green-900 flex items-center gap-1">
@@ -276,7 +270,7 @@ export default function AdminUsersPage() {
                         )}
                       </div>
                     </td>
-                    <td className="p-6">
+                    <td className="px-4 py-4">
                       {user.is_staff ? (
                         <span className="text-[9px] font-black px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-900 flex items-center gap-1 w-fit">
                           <Shield size={12} />
@@ -288,7 +282,7 @@ export default function AdminUsersPage() {
                         </span>
                       )}
                     </td>
-                    <td className="p-6">
+                    <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         <Calendar size={14} className="text-gray-400 dark:text-neutral-500" />
                         <span className="text-[9px] text-gray-400 dark:text-neutral-500">
@@ -296,12 +290,12 @@ export default function AdminUsersPage() {
                         </span>
                       </div>
                     </td>
-                    <td className="p-6">
+                    <td className="px-4 py-4">
                       <span className="text-[9px] text-gray-400 dark:text-neutral-500">
                         {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}
                       </span>
                     </td>
-                    <td className="p-6">
+                    <td className="px-4 py-4">
                       {user.is_staff ? (
                         <span className="text-[9px] text-gray-300 dark:text-neutral-600">—</span>
                       ) : (
