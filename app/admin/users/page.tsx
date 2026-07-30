@@ -66,6 +66,23 @@ export default function AdminUsersPage() {
     }
   };
 
+  const [busyUserId, setBusyUserId] = useState<number | null>(null);
+
+  const handleToggleBan = async (target: User) => {
+    const banning = target.is_active;
+    const label = `${target.first_name || ''} ${target.last_name || ''}`.trim() || target.email;
+    if (!confirm(`${banning ? 'Ban' : 'Unban'} ${label}? ${banning ? 'They will be logged out and unable to sign in.' : 'They will be able to sign in again.'}`)) return;
+    setBusyUserId(target.id);
+    try {
+      await adminAPI.setUserActive(target.id, !target.is_active);
+      setUsers((prev) => prev.map((u) => (u.id === target.id ? { ...u, is_active: !u.is_active } : u)));
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Failed to update account status');
+    } finally {
+      setBusyUserId(null);
+    }
+  };
+
   // Users are already filtered by the backend
   const filteredUsers = users;
 
@@ -193,12 +210,13 @@ export default function AdminUsersPage() {
                 <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Role</th>
                 <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Joined</th>
                 <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Last Login</th>
+                <th className="text-left p-6 text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-12 text-center">
+                  <td colSpan={8} className="p-12 text-center">
                     <Users className="w-16 h-16 text-gray-300 dark:text-neutral-600 mx-auto mb-4" />
                     <p className="text-gray-400 dark:text-neutral-500 font-bold uppercase">No users found</p>
                     <p className="text-[9px] text-gray-400 dark:text-neutral-500 mt-2">User management endpoint needs to be implemented</p>
@@ -282,6 +300,24 @@ export default function AdminUsersPage() {
                       <span className="text-[9px] text-gray-400 dark:text-neutral-500">
                         {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}
                       </span>
+                    </td>
+                    <td className="p-6">
+                      {user.is_staff ? (
+                        <span className="text-[9px] text-gray-300 dark:text-neutral-600">—</span>
+                      ) : (
+                        <button
+                          onClick={() => handleToggleBan(user)}
+                          disabled={busyUserId === user.id}
+                          className={`text-[9px] font-black px-3 py-1.5 rounded-full border transition-all disabled:opacity-50 flex items-center gap-1 ${
+                            user.is_active
+                              ? 'bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-300 border-red-200 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-950/60'
+                              : 'bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-300 border-green-200 dark:border-green-900 hover:bg-green-100 dark:hover:bg-green-950/60'
+                          }`}
+                        >
+                          <UserX size={11} />
+                          {busyUserId === user.id ? '…' : user.is_active ? 'Ban' : 'Unban'}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))

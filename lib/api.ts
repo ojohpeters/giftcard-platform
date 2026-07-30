@@ -493,6 +493,9 @@ export const adminAPI = {
     api.post('/admin/dashboard/withdrawals/reject/', { withdrawal_id: withdrawalId, reason }),
   creditUserWallet: (userId: number, amount: number, description?: string) =>
     api.post('/admin/dashboard/withdrawals/credit_user/', { user_id: userId, amount, description }),
+  // Ban (is_active=false) or unban (is_active=true) a user account
+  setUserActive: (userId: number, isActive: boolean) =>
+    api.post('/admin/dashboard/users/set_active/', { user_id: userId, is_active: isActive }),
 
   // Catalog (brand) management — the system the storefront /buy actually uses
   listCatalogBrands: () => api.get('/admin/catalog/brands/'),

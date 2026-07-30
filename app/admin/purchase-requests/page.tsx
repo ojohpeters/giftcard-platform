@@ -27,8 +27,11 @@ interface PurchaseRequest {
     email: string;
     first_name: string;
     last_name: string;
+    phone_number?: string;
   } | number;
   user_email?: string;
+  customer_ip?: string | null;
+  customer_user_agent?: string;
   brand_name: string;
   country_name: string;
   card_type: string;
@@ -473,6 +476,39 @@ export default function AdminPurchaseRequestsPage() {
                 </span>
               </div>
             </div>
+
+            {/* Customer identity + device (for fraud/audit review) */}
+            {(() => {
+              const u = (typeof selectedRequest.user === 'object' && selectedRequest.user) ? selectedRequest.user : null;
+              const fullName = u ? `${u.first_name || ''} ${u.last_name || ''}`.trim() : '';
+              return (
+                <div className="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Customer</p>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                    <div>
+                      <span className="text-[10px] text-gray-400 uppercase block">Name</span>
+                      <span className="text-sm font-medium">{fullName || '—'}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 uppercase block">Email</span>
+                      <span className="text-sm font-medium break-all">{u?.email || getUserEmail(selectedRequest)}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 uppercase block">Phone</span>
+                      <span className="text-sm font-medium">{u?.phone_number || '—'}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 uppercase block">IP address</span>
+                      <span className="text-sm font-medium">{selectedRequest.customer_ip || '—'}</span>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-[10px] text-gray-400 uppercase block">Browser / device</span>
+                      <span className="text-xs text-gray-600 break-all">{selectedRequest.customer_user_agent || '—'}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {selectedRequest.assigned_codes && selectedRequest.assigned_codes.length > 0 && (
               <div className="mb-4">

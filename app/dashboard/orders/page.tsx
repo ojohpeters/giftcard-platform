@@ -289,6 +289,12 @@ export default function OrdersPage() {
             </div>
           ) : (
             <div className="space-y-4">
+              {filteredRequests.some((r) => r.status === 'approved' && r.payment_status !== 'paid') && (
+                <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-xl px-4 py-3">
+                  <Clock size={16} className="text-blue-600 shrink-0 mt-0.5" />
+                  <p className="text-xs font-bold text-blue-700 dark:text-blue-300">{t('dashOrders.payWindowNote')}</p>
+                </div>
+              )}
               {filteredRequests.map((request) => (
                 <div key={request.id} className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-2xl p-4 md:p-6 shadow-sm hover:shadow-md transition-all">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
