@@ -119,17 +119,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <LayoutGrid size={18} className={pathname === '/admin' || pathname === '/admin/' ? 'text-blue-600' : 'group-hover:text-gray-900 dark:group-hover:text-neutral-100'} />
             Overview
           </Link>
-          <Link 
-            href="/admin/products" 
-            className={`flex items-center gap-3 px-3 py-2 text-sm font-bold rounded-xl transition-all group ${
-              pathname === '/admin/products'
-                ? 'text-gray-900 bg-blue-50 dark:text-neutral-100 dark:bg-blue-950/40'
-                : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50 dark:text-neutral-500 dark:hover:text-neutral-100 dark:hover:bg-neutral-800'
-            }`}
-          >
-            <Package size={18} className={pathname === '/admin/products' ? 'text-blue-600' : 'group-hover:text-gray-900 dark:group-hover:text-neutral-100'} />
-            Products
-          </Link>
+          {/* Legacy Products (instant-delivery/cart model) hidden — the live store
+              uses the Catalog. Page still exists at /admin/products if needed. */}
           <Link
             href="/admin/catalog"
             className={`flex items-center gap-3 px-3 py-2 text-sm font-bold rounded-xl transition-all group ${

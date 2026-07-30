@@ -4,11 +4,13 @@ import { adminAPI, productsAPI } from '@/lib/api';
 import { currencySymbol, formatMoney } from '@/lib/currency';
 import {
   Package, Plus, Trash2, Pencil, Loader2, Upload, X, ChevronDown, ChevronRight, Layers,
+  Eye, EyeOff, Lock, Unlock,
 } from "lucide-react";
 
 interface CardType {
   id: string; country: string; country_name: string; card_type: string;
   min_amount: string; max_amount: string | null; rate: string; is_active: boolean;
+  requires_login?: boolean;
 }
 interface Brand {
   id: string; name: string; slug: string; logo: string; image: string;
@@ -103,6 +105,20 @@ export default function AdminCatalogPage() {
     } finally { setCtSaving(false); }
   };
 
+  const patchCardType = async (id: string, data: Partial<CardType>) => {
+    try { await adminAPI.updateCatalogCardType(id, data); await load(); }
+    catch { setError('Failed to update card.'); }
+  };
+
+  const toggleBrandActive = async (b: Brand) => {
+    try {
+      const fd = new FormData();
+      fd.append('is_active', String(!b.is_active));
+      await adminAPI.updateCatalogBrand(b.id, fd);
+      await load();
+    } catch { setError('Failed to update brand.'); }
+  };
+
   const deleteCardType = async (id: string) => {
     if (!confirm('Remove this card type?')) return;
     try { await adminAPI.deleteCatalogCardType(id); await load(); } catch { setError('Failed to remove.'); }
@@ -192,9 +208,14 @@ export default function AdminCatalogPage() {
                   <p className="font-black text-gray-900 dark:text-neutral-100 truncate">{b.name}</p>
                   <p className="text-xs text-gray-400 dark:text-neutral-500">{b.card_types_count} card type{b.card_types_count === 1 ? '' : 's'}{b.category_name ? ` · ${b.category_name}` : ''}</p>
                 </div>
-                <span className={`text-[9px] font-black px-2 py-1 rounded-full uppercase ${b.is_active ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300' : 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-neutral-400'}`}>
+                <button
+                  onClick={() => toggleBrandActive(b)}
+                  title={b.is_active ? 'Live in store — click to hide' : 'Hidden — click to show'}
+                  className={`inline-flex items-center gap-1 text-[9px] font-black px-2.5 py-1.5 rounded-full uppercase transition-colors ${b.is_active ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300 hover:bg-green-100' : 'bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-neutral-400 hover:bg-gray-200'}`}
+                >
+                  {b.is_active ? <Eye size={11} /> : <EyeOff size={11} />}
                   {b.is_active ? 'Live' : 'Hidden'}
-                </span>
+                </button>
                 <button onClick={() => openEdit(b)} className="p-2 text-gray-400 hover:text-blue-600" title="Edit"><Pencil size={16} /></button>
                 <button onClick={() => deleteBrand(b)} className="p-2 text-gray-400 hover:text-red-600" title="Delete"><Trash2 size={16} /></button>
                 <button onClick={() => setExpanded(expanded === b.id ? null : b.id)} className="p-2 text-gray-400 hover:text-gray-700 dark:hover:text-neutral-200" title="Card types">
@@ -209,12 +230,30 @@ export default function AdminCatalogPage() {
                   {b.card_types.length > 0 && (
                     <div className="space-y-2">
                       {b.card_types.map((ct) => (
-                        <div key={ct.id} className="flex items-center gap-3 bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-xl px-3 py-2 text-xs">
+                        <div key={ct.id} className={`flex items-center gap-3 border rounded-xl px-3 py-2 text-xs transition-colors ${ct.is_active ? 'bg-white dark:bg-neutral-900 border-gray-100 dark:border-neutral-800' : 'bg-gray-50 dark:bg-neutral-950 border-dashed border-gray-200 dark:border-neutral-700 opacity-70'}`}>
                           <span className="font-black">{ct.country_name}</span>
                           <span className={`px-2 py-0.5 rounded-full font-bold ${ct.card_type === 'E-CODE' ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300' : 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300'}`}>{ct.card_type}</span>
                           <span className="text-gray-500 dark:text-neutral-400">{formatMoney(ct.min_amount, curOf(ct.country))}{ct.max_amount ? `–${formatMoney(ct.max_amount, curOf(ct.country))}` : '+'}</span>
                           {Number(ct.rate) > 0 && <span className="text-[10px] text-gray-400 dark:text-neutral-500">· {Number(ct.rate).toLocaleString()} تومان/{currencySymbol(curOf(ct.country)).trim()}</span>}
-                          <button onClick={() => deleteCardType(ct.id)} className="ml-auto text-gray-400 hover:text-red-600"><Trash2 size={14} /></button>
+                          {!ct.is_active && <span className="text-[9px] font-black uppercase tracking-wider text-gray-400 dark:text-neutral-500">Hidden</span>}
+                          {ct.requires_login && <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400"><Lock size={10} />Login</span>}
+                          <div className="ml-auto flex items-center gap-1">
+                            <button
+                              onClick={() => patchCardType(ct.id, { is_active: !ct.is_active })}
+                              title={ct.is_active ? 'Hide from store' : 'Show in store'}
+                              className={`p-1.5 rounded-lg transition-colors ${ct.is_active ? 'text-green-600 hover:bg-green-50 dark:hover:bg-green-950/40' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800'}`}
+                            >
+                              {ct.is_active ? <Eye size={14} /> : <EyeOff size={14} />}
+                            </button>
+                            <button
+                              onClick={() => patchCardType(ct.id, { requires_login: !ct.requires_login })}
+                              title={ct.requires_login ? 'Login required (click to make public)' : 'Public (click to require login)'}
+                              className={`p-1.5 rounded-lg transition-colors ${ct.requires_login ? 'text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800'}`}
+                            >
+                              {ct.requires_login ? <Lock size={14} /> : <Unlock size={14} />}
+                            </button>
+                            <button onClick={() => deleteCardType(ct.id)} title="Delete" className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"><Trash2 size={14} /></button>
+                          </div>
                         </div>
                       ))}
                     </div>
