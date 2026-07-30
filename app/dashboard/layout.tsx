@@ -85,7 +85,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <nav className="flex-1 space-y-12">
           {/* Operations Group */}
           <div className="space-y-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-300 dark:text-neutral-600 ml-1">{t('dashNav.main')}</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-300 dark:text-neutral-600 ml-1">{t('dashNav.main')}</p>
             <div className="space-y-1">
               <NavLink href="/dashboard" icon={LayoutGrid} label={t('dashNav.overview')} />
               <NavLink href="/dashboard/orders" icon={History} label={t('dashNav.history')} />
@@ -97,7 +97,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           
           {/* Finance Group */}
           <div className="space-y-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-300 dark:text-neutral-600 ml-1">{t('dashNav.finance')}</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-gray-300 dark:text-neutral-600 ml-1">{t('dashNav.finance')}</p>
             <div className="space-y-1">
               <NavLink href="/dashboard/withdraw" icon={ArrowUpRight} label={t('dashNav.payout')} />
               <NavLink href="/dashboard/settings" icon={Settings} label={t('dashNav.settings')} />
@@ -110,12 +110,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="bg-[#fcfcfd] dark:bg-neutral-800 border border-gray-100 dark:border-neutral-800 p-6 rounded-3xl overflow-hidden">
             <div className="flex items-center gap-2 mb-3">
               <Wallet size={14} className="text-gray-400 dark:text-neutral-500 shrink-0" />
-              <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-widest">{t('dashNav.balance')}</p>
+              <p className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-widest">{t('dashNav.balance')}</p>
             </div>
             <p className="text-xl font-black text-gray-900 dark:text-neutral-100 tracking-tighter truncate">
               {formatIRRShort(wallet?.balance || '0')} تومان
             </p>
-            <p className="text-[10px] text-gray-400 dark:text-neutral-500 font-medium mt-1 truncate" title={user?.email}>
+            <p className="text-[11px] text-gray-400 dark:text-neutral-500 font-medium mt-1 truncate" title={user?.email}>
               {user?.email}
             </p>
           </div>

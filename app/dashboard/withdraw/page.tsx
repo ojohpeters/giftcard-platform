@@ -186,17 +186,17 @@ export default function WithdrawPage() {
     <div className="w-full max-w-2xl mx-auto space-y-4 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10 px-0">
       
       {/* BACK NAV */}
-      <Link href="/dashboard" className="inline-flex items-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-neutral-500 hover:text-black dark:hover:text-neutral-100 transition-colors px-4 md:px-0">
-        <ArrowLeft size={12} />
+      <Link href="/dashboard" className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-neutral-500 hover:text-black dark:hover:text-neutral-100 transition-colors px-4 md:px-0">
+        <ArrowLeft size={14} className="rtl:rotate-180" />
         {t('dashWithdraw.back')}
       </Link>
 
       {/* HEADER */}
       <div className="space-y-1 px-4 md:px-0">
-        <h1 className="text-3xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
+        <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
           {t('dashWithdraw.title')}<span className="text-gray-200">.</span>
         </h1>
-        <p className="text-[8px] md:text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-widest">
+        <p className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-widest">
           {t('dashWithdraw.subtitle')}
         </p>
       </div>
@@ -221,13 +221,13 @@ export default function WithdrawPage() {
             <p className="text-sm font-black text-yellow-800 dark:text-yellow-200">
               {kycStatus === 'pending' ? t('dashWithdraw.kyc_pending_title') : t('dashWithdraw.kyc_required_title')}
             </p>
-            <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+            <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
               {kycStatus === 'pending'
                 ? t('dashWithdraw.kyc_pending_desc')
                 : t('dashWithdraw.kyc_required_desc')}
             </p>
             {kycStatus !== 'pending' && (
-              <Link href="/dashboard/settings" className="inline-block mt-2 text-xs font-black text-yellow-800 dark:text-yellow-200 underline">
+              <Link href="/dashboard/settings" className="inline-block mt-2 text-sm font-black text-yellow-800 dark:text-yellow-200 underline">
                 {t('dashWithdraw.verify_now')}
               </Link>
             )}
@@ -240,20 +240,24 @@ export default function WithdrawPage() {
         <div className="relative z-10 space-y-6 md:space-y-10">
           
           {/* BALANCE INFO */}
-          <div className="space-y-0.5">
-            <p className="text-[8px] font-black text-blue-500 uppercase tracking-[0.3em]">{t('dashWithdraw.available_balance')}</p>
-            <p className="text-xl md:text-3xl font-black text-white tabular-nums tracking-tighter">
+          <div className="space-y-1">
+            <p className="text-[11px] font-black text-blue-500 uppercase tracking-[0.3em]">{t('dashWithdraw.available_balance')}</p>
+            <p className="text-3xl md:text-4xl font-black text-white tabular-nums tracking-tighter">
               {formatIRRShort(wallet?.balance || "0")} تومان
             </p>
-            <p className="text-[10px] text-gray-500 mt-2">
-              {t('dashWithdraw.total_earned')} {formatIRRShort(wallet?.total_earned || "0")} تومان |
-              {t('dashWithdraw.total_withdrawn')} {formatIRRShort(wallet?.total_withdrawn || "0")} تومان
-            </p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2">
+              <p className="text-[11px] text-gray-400">
+                {t('dashWithdraw.total_earned')} <span className="text-gray-200 font-bold tabular-nums">{formatIRRShort(wallet?.total_earned || "0")}</span> تومان
+              </p>
+              <p className="text-[11px] text-gray-400">
+                {t('dashWithdraw.total_withdrawn')} <span className="text-gray-200 font-bold tabular-nums">{formatIRRShort(wallet?.total_withdrawn || "0")}</span> تومان
+              </p>
+            </div>
           </div>
 
           {/* INPUT AREA */}
           <div className="space-y-2">
-            <label className="text-[8px] md:text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">{t('dashWithdraw.amount_label')}</label>
+            <label className="text-[11px] font-black text-gray-500 uppercase tracking-[0.3em]">{t('dashWithdraw.amount_label')}</label>
             <div className="relative flex items-center border-b border-white/10 focus-within:border-blue-600 transition-colors pb-2">
               <span className="text-xl md:text-4xl font-bold text-gray-600 mr-2">تومان</span>
               <input 
@@ -267,49 +271,49 @@ export default function WithdrawPage() {
           </div>
 
           {/* BANK DETAILS */}
-          <div 
-            className="bg-white/5 border border-white/10 rounded-xl md:rounded-2xl p-3 md:p-6 flex justify-between items-center group cursor-pointer hover:bg-white/10 transition-all"
+          <div
+            className="bg-white/5 border border-white/10 rounded-xl md:rounded-2xl p-4 md:p-6 flex justify-between items-center gap-3 group cursor-pointer hover:bg-white/10 transition-all"
             onClick={() => setShowBankForm(!showBankForm)}
           >
-            <div className="space-y-0.5">
-              <p className="text-[7px] font-black text-gray-500 uppercase tracking-widest">{t('dashWithdraw.to_label')}</p>
+            <div className="space-y-1 min-w-0">
+              <p className="text-[11px] font-black text-gray-500 uppercase tracking-widest">{t('dashWithdraw.to_label')}</p>
               {bankDetail ? (
-                <p className="text-[10px] md:text-sm font-black text-white uppercase tracking-tight">
+                <p className="text-sm font-black text-white uppercase tracking-tight truncate">
                   {bankDetail.bank_name} • ****{bankDetail.account_number.slice(-4)}
                 </p>
               ) : (
-                <p className="text-[10px] md:text-sm font-black text-yellow-500 uppercase tracking-tight">
+                <p className="text-sm font-black text-yellow-500 uppercase tracking-tight">
                   {t('dashWithdraw.add_bank_details')}
                 </p>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               {!bankDetail && (
-                <Plus size={14} className="text-gray-600" />
+                <Plus size={18} className="text-gray-500" />
               )}
-              <ChevronRight size={14} className="text-gray-600" />
+              <ChevronRight size={18} className="text-gray-500 rtl:rotate-180" />
             </div>
           </div>
 
           {/* BANK DETAILS FORM */}
           {showBankForm && (
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-4">
+            <div className="bg-white/5 border border-white/10 rounded-xl md:rounded-2xl p-4 md:p-6 space-y-4">
               <div className="flex justify-between items-center">
-                <p className="text-[10px] font-black text-white uppercase tracking-wide">
+                <p className="text-[11px] font-black text-white uppercase tracking-wide">
                   {bankDetail ? t('dashWithdraw.update_bank_details') : t('dashWithdraw.add_bank_details')}
                 </p>
-                <button onClick={() => setShowBankForm(false)} className="text-gray-400 hover:text-white">
-                  <X size={16} />
+                <button onClick={() => setShowBankForm(false)} className="text-gray-400 hover:text-white p-1 -m-1">
+                  <X size={18} />
                 </button>
               </div>
-              
+
               <form onSubmit={handleSaveBankDetail} className="space-y-3">
                 <input
                   type="text"
                   placeholder={t('dashWithdraw.placeholder_bank_name')}
                   value={bankForm.bank_name}
                   onChange={(e) => setBankForm({...bankForm, bank_name: e.target.value})}
-                  className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 text-sm outline-none focus:border-blue-600"
+                  className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3.5 text-white placeholder:text-gray-500 text-sm outline-none focus:border-blue-600"
                   required
                 />
                 <input
@@ -317,7 +321,7 @@ export default function WithdrawPage() {
                   placeholder={t('dashWithdraw.placeholder_account_name')}
                   value={bankForm.account_name}
                   onChange={(e) => setBankForm({...bankForm, account_name: e.target.value})}
-                  className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 text-sm outline-none focus:border-blue-600"
+                  className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3.5 text-white placeholder:text-gray-500 text-sm outline-none focus:border-blue-600"
                   required
                 />
                 <input
@@ -325,7 +329,7 @@ export default function WithdrawPage() {
                   placeholder={t('dashWithdraw.placeholder_account_number')}
                   value={bankForm.account_number}
                   onChange={(e) => setBankForm({...bankForm, account_number: e.target.value})}
-                  className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 text-sm outline-none focus:border-blue-600"
+                  className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3.5 text-white placeholder:text-gray-500 text-sm outline-none focus:border-blue-600"
                   required
                 />
                 <input
@@ -333,12 +337,12 @@ export default function WithdrawPage() {
                   placeholder={t('dashWithdraw.placeholder_branch')}
                   value={bankForm.branch}
                   onChange={(e) => setBankForm({...bankForm, branch: e.target.value})}
-                  className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-white placeholder:text-gray-500 text-sm outline-none focus:border-blue-600"
+                  className="w-full bg-white/10 border border-white/10 rounded-lg px-4 py-3.5 text-white placeholder:text-gray-500 text-sm outline-none focus:border-blue-600"
                 />
-                <button 
+                <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-blue-600 text-white py-2 rounded-lg font-black uppercase text-[10px] tracking-[0.2em] hover:bg-blue-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full bg-blue-600 text-white py-3.5 rounded-lg font-black uppercase text-[11px] tracking-[0.2em] hover:bg-blue-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {submitting ? <Loader2 size={14} className="animate-spin" /> : null}
                   {t('dashWithdraw.save_bank_details')}
@@ -351,7 +355,7 @@ export default function WithdrawPage() {
           <button
             onClick={handleWithdraw}
             disabled={submitting || !amount || !bankDetail || kycStatus !== 'approved'}
-            className="w-full bg-white text-black py-4 md:py-6 rounded-xl md:rounded-2xl font-black uppercase text-[10px] md:text-[12px] tracking-[0.2em] md:tracking-[0.4em] hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center gap-2 shadow-xl active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-white text-black py-4 md:py-6 rounded-xl md:rounded-2xl font-black uppercase text-[11px] md:text-[12px] tracking-[0.2em] md:tracking-[0.4em] hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center gap-2 shadow-xl active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <Loader2 size={14} className="animate-spin" />
@@ -364,29 +368,32 @@ export default function WithdrawPage() {
       </div>
 
       {/* RECENT WITHDRAWALS */}
-      <div className="px-4 md:px-0 space-y-2">
-        <h3 className="text-[8px] md:text-[9px] font-black text-gray-400 dark:text-neutral-500 uppercase tracking-[0.3em]">{t('dashWithdraw.history_heading')}</h3>
+      <div className="px-4 md:px-0 space-y-3">
+        <h3 className="text-[11px] font-black text-gray-400 dark:text-neutral-500 uppercase tracking-[0.3em]">{t('dashWithdraw.history_heading')}</h3>
         {withdrawals.length > 0 ? (
           <div className="space-y-2">
             {withdrawals.slice(0, 5).map((withdrawal) => (
-              <div key={withdrawal.id} className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-xl p-3 flex justify-between items-center">
-                <div>
-                  <span className="text-[10px] font-black uppercase tabular-nums">
+              <div key={withdrawal.id} className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-2xl p-4 flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-lg font-black uppercase tabular-nums tracking-tight">
                     {formatIRRShort(withdrawal.amount)} تومان
                   </span>
-                  <span className={`ml-2 text-[8px] font-bold px-2 py-0.5 rounded-full ${getStatusColor(withdrawal.status)}`}>
+                  <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${getStatusColor(withdrawal.status)}`}>
                     {withdrawal.status}
                   </span>
                 </div>
-                <span className="text-[8px] font-bold text-gray-400 dark:text-neutral-500 uppercase">
+                <span className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase">
                   {formatDate(withdrawal.created_at)}
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <div className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-xl p-4 text-center">
-            <p className="text-[10px] text-gray-400 dark:text-neutral-500 font-bold">{t('dashWithdraw.no_history')}</p>
+          <div className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-2xl px-6 py-14 flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-neutral-800 flex items-center justify-center mb-5">
+              <Banknote className="w-8 h-8 text-gray-300 dark:text-neutral-600" />
+            </div>
+            <p className="text-lg font-black uppercase italic text-gray-900 dark:text-neutral-100">{t('dashWithdraw.no_history')}</p>
           </div>
         )}
       </div>

@@ -107,8 +107,8 @@ export default function SubmissionsPage() {
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700 px-4 md:px-0 pb-20">
       
       {/* BACK NAV */}
-      <Link href="/dashboard" className="inline-flex items-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-neutral-500 hover:text-black dark:hover:text-neutral-100 transition-colors">
-        <ArrowLeft size={12} />
+      <Link href="/dashboard" className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-neutral-500 hover:text-black dark:hover:text-neutral-100 transition-colors">
+        <ArrowLeft size={14} className="rtl:rotate-180" />
         {t('submissions.backToDashboard')}
       </Link>
 
@@ -116,7 +116,7 @@ export default function SubmissionsPage() {
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <div className="h-1 w-4 bg-blue-600"></div>
-          <p className="text-[9px] font-black text-blue-600 uppercase tracking-[0.4em]">{t('submissions.eyebrow')}</p>
+          <p className="text-[11px] font-black text-blue-600 uppercase tracking-[0.4em]">{t('submissions.eyebrow')}</p>
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-neutral-100 tracking-tighter italic uppercase leading-none">
           {t('submissions.titlePart1')}<span className="text-gray-200">.</span> {t('submissions.titlePart2')}
@@ -133,13 +133,15 @@ export default function SubmissionsPage() {
 
       {/* SUBMISSIONS LIST */}
       {submissions.length === 0 ? (
-        <div className="bg-white dark:bg-neutral-900 border-2 border-gray-200 dark:border-neutral-700 rounded-[32px] p-12 text-center">
-          <Package className="w-16 h-16 text-gray-300 dark:text-neutral-600 mx-auto mb-4" />
-          <p className="text-gray-400 dark:text-neutral-500 font-black uppercase tracking-widest">{t('submissions.emptyTitle')}</p>
-          <p className="text-sm text-gray-400 dark:text-neutral-500 mt-2">{t('submissions.emptyDesc')}</p>
+        <div className="bg-white dark:bg-neutral-900 border-2 border-gray-200 dark:border-neutral-700 rounded-[32px] px-6 py-14 md:py-16 flex flex-col items-center text-center">
+          <div className="w-20 h-20 rounded-3xl bg-gray-100 dark:bg-neutral-800 flex items-center justify-center mb-5">
+            <Package className="w-10 h-10 text-gray-400 dark:text-neutral-500" />
+          </div>
+          <p className="text-lg font-black uppercase italic tracking-tight text-gray-900 dark:text-neutral-100">{t('submissions.emptyTitle')}</p>
+          <p className="text-sm text-gray-500 dark:text-neutral-400 mt-2 max-w-xs">{t('submissions.emptyDesc')}</p>
           <Link
             href="/sell"
-            className="inline-block mt-6 px-6 py-3 bg-blue-600 text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 transition-all"
+            className="inline-flex items-center justify-center w-full md:w-auto mt-7 px-8 py-3.5 bg-blue-600 text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 transition-all"
           >
             {t('submissions.sellCta')}
           </Link>
@@ -149,9 +151,9 @@ export default function SubmissionsPage() {
           {submissions.map((submission) => (
             <div 
               key={submission.id} 
-              className="bg-white dark:bg-neutral-900 border-2 border-gray-200 dark:border-neutral-700 rounded-[24px] p-6 hover:shadow-lg transition-all"
+              className="bg-white dark:bg-neutral-900 border-2 border-gray-200 dark:border-neutral-700 rounded-[24px] p-5 md:p-6 hover:shadow-lg transition-all"
             >
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-0 md:gap-4">
                 {/* LEFT: INFO */}
                 <div className="flex items-start gap-4">
                   <div className="w-14 h-14 bg-gray-100 dark:bg-neutral-800 rounded-2xl flex items-center justify-center shrink-0">
@@ -166,38 +168,40 @@ export default function SubmissionsPage() {
                     <p className="text-sm text-gray-500 dark:text-neutral-400 mt-1">
                       {submission.submission_type === 'ecode' ? t('submissions.typeEcode') : t('submissions.typePhysical')} • ${submission.amount} {submission.currency}
                     </p>
-                    <p className="text-[10px] text-gray-400 dark:text-neutral-500 mt-1">
+                    <p className="text-[11px] text-gray-400 dark:text-neutral-500 mt-1.5">
                       {t('submissions.submitted')} {formatDate(submission.created_at)}
                     </p>
                   </div>
                 </div>
 
                 {/* RIGHT: STATUS & AMOUNT */}
-                <div className="flex items-center gap-6">
+                <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6 w-full md:w-auto mt-4 pt-4 md:mt-0 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-neutral-800">
                   {submission.credit_amount && (
-                    <div className="text-right">
-                      <p className="text-[10px] font-black text-gray-400 dark:text-neutral-500 uppercase">{t('submissions.credit')}</p>
-                      <p className="text-lg font-black text-green-600">{formatIRRShort(submission.credit_amount)} تومان</p>
+                    <div className="text-start md:text-end">
+                      <p className="text-[11px] font-black text-gray-400 dark:text-neutral-500 uppercase tracking-wide">{t('submissions.credit')}</p>
+                      <p className="text-xl font-black text-green-600 dark:text-green-400">{formatIRRShort(submission.credit_amount)} تومان</p>
                     </div>
                   )}
-                  <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border ${getStatusColor(submission.status)}`}>
-                    {getStatusIcon(submission.status)}
-                    {submission.status}
+                  <div className="flex items-center gap-2 md:gap-3 ms-auto md:ms-0">
+                    <div className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center gap-2 border ${getStatusColor(submission.status)}`}>
+                      {getStatusIcon(submission.status)}
+                      {submission.status}
+                    </div>
+                    <button
+                      onClick={() => setSelectedSubmission(submission)}
+                      className="p-2.5 bg-gray-100 dark:bg-neutral-800 rounded-xl hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all shrink-0"
+                      title={t('submissions.viewDetails')}
+                    >
+                      <Eye size={18} />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => setSelectedSubmission(submission)}
-                    className="p-2 bg-gray-100 dark:bg-neutral-800 rounded-xl hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all"
-                    title={t('submissions.viewDetails')}
-                  >
-                    <Eye size={18} />
-                  </button>
                 </div>
               </div>
 
               {/* ADMIN NOTES */}
               {submission.admin_notes && (
                 <div className="mt-4 pt-4 border-t border-gray-100 dark:border-neutral-800">
-                  <p className="text-[10px] font-black text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('submissions.adminNotes')}</p>
+                  <p className="text-[11px] font-black text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('submissions.adminNotes')}</p>
                   <p className="text-sm text-gray-600 dark:text-neutral-300">{submission.admin_notes}</p>
                 </div>
               )}
@@ -213,10 +217,10 @@ export default function SubmissionsPage() {
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setSelectedSubmission(null)}
           />
-          <div className="relative bg-white dark:bg-neutral-900 rounded-[32px] p-8 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-300">
+          <div className="relative bg-white dark:bg-neutral-900 rounded-[32px] p-6 md:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-300">
             <button
               onClick={() => setSelectedSubmission(null)}
-              className="absolute top-4 right-4 w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all"
+              className="absolute top-4 end-4 w-10 h-10 bg-gray-100 dark:bg-neutral-800 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all"
             >
               ×
             </button>
@@ -244,7 +248,7 @@ export default function SubmissionsPage() {
               )}
               <div className="flex justify-between py-2 border-b border-gray-100 dark:border-neutral-800">
                 <span className="text-sm text-gray-500 dark:text-neutral-400">{t('submissions.status')}</span>
-                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${getStatusColor(selectedSubmission.status)}`}>
+                <span className={`px-3 py-1 rounded-full text-[11px] font-black uppercase ${getStatusColor(selectedSubmission.status)}`}>
                   {selectedSubmission.status}
                 </span>
               </div>

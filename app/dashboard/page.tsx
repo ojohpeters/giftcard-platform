@@ -195,7 +195,7 @@ export default function DashboardPage() {
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <div className="h-1 w-4 bg-blue-600"></div>
-          <p className="text-[9px] font-black text-blue-600 uppercase tracking-[0.4em]">{t('dashHome.eyebrow')}</p>
+          <p className="text-[11px] font-black text-blue-600 uppercase tracking-[0.4em]">{t('dashHome.eyebrow')}</p>
         </div>
         <h1 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-neutral-100 tracking-tighter italic uppercase leading-none">
           {t('dashHome.welcome')}<span className="text-gray-200">,</span> {user?.first_name || 'User'}
@@ -203,16 +203,16 @@ export default function DashboardPage() {
       </div>
 
       {/* STATS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-700 p-6 rounded-[32px] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-none">
+          <div key={i} className={`bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-700 p-5 md:p-6 rounded-[28px] md:rounded-[32px] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-none ${i === 0 ? 'col-span-2 md:col-span-1' : ''}`}>
             <div className="flex items-center justify-between mb-4">
               <div className={`${stat.bg} p-3 rounded-2xl`}>
                 <stat.icon className={`${stat.color} w-6 h-6`} />
               </div>
             </div>
-            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500 mb-2">{stat.label}</p>
-            <p className="text-3xl font-black tracking-tighter leading-none">{stat.value}</p>
+            <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500 mb-2">{stat.label}</p>
+            <p className={`font-black tracking-tighter leading-none break-words ${i === 0 ? 'text-2xl md:text-3xl' : 'text-xl md:text-2xl'}`}>{stat.value}</p>
           </div>
         ))}
       </div>
@@ -221,8 +221,8 @@ export default function DashboardPage() {
       <div className="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-700 rounded-[32px] overflow-hidden shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] dark:shadow-none">
         <div className="p-6 md:p-8 border-b-4 border-black dark:border-neutral-700 bg-gray-50 dark:bg-neutral-900 flex justify-between items-center">
           <h2 className="font-black uppercase italic text-lg md:text-2xl">{t('dashHome.recentTransactions')}</h2>
-          <Link href="/dashboard/orders" className="text-blue-600 hover:text-blue-700 font-black uppercase text-xs tracking-widest flex items-center gap-2">
-            {t('dashHome.viewAll')} <ArrowRight size={14} />
+          <Link href="/dashboard/orders" className="text-blue-600 hover:text-blue-700 font-black uppercase text-xs tracking-widest flex items-center gap-2 py-1">
+            {t('dashHome.viewAll')} <ArrowRight size={14} className="rtl:rotate-180" />
           </Link>
         </div>
         <div className="divide-y-2 divide-black dark:divide-neutral-700">
@@ -232,25 +232,25 @@ export default function DashboardPage() {
               <div key={`${tx.type}-${tx.id}`} className="p-5 md:p-8 group transition-colors hover:bg-gray-50 dark:hover:bg-neutral-800">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-black dark:bg-neutral-800 text-white flex items-center justify-center rounded-2xl font-black italic">
+                    <div className="w-12 h-12 shrink-0 bg-black dark:bg-neutral-800 text-white flex items-center justify-center rounded-2xl font-black italic">
                       <Icon size={20} />
                     </div>
-                    <div>
-                      <p className="font-black italic text-lg md:text-xl leading-none">{tx.description}</p>
-                      <p className="text-[9px] font-black text-gray-400 dark:text-neutral-500 uppercase mt-1 tracking-widest">
+                    <div className="min-w-0">
+                      <p className="font-black italic text-base md:text-xl leading-tight">{tx.description}</p>
+                      <p className="text-[11px] font-black text-gray-400 dark:text-neutral-500 uppercase mt-1 tracking-widest">
                         {tx.type.toUpperCase()} · {new Date(tx.created_at).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-6">
-                    <div className="text-right">
-                      <p className="text-[8px] font-black uppercase text-gray-400 dark:text-neutral-500 mb-1">{t('dashHome.amount')}</p>
-                      <p className={`font-black text-xl md:text-2xl italic ${tx.type === 'withdrawal' ? 'text-red-600' : 'text-green-600'}`}>
+                  <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6">
+                    <div className="text-start md:text-end">
+                      <p className="text-[11px] font-black uppercase text-gray-400 dark:text-neutral-500 mb-1 tracking-widest">{t('dashHome.amount')}</p>
+                      <p className={`font-black text-xl md:text-2xl italic ${tx.type === 'withdrawal' ? 'text-red-600 dark:text-red-500' : 'text-green-600 dark:text-green-500'}`}>
                         {tx.type === 'withdrawal' ? '-' : '+'}{formatIRRShort(tx.amount)} تومان
                       </p>
                     </div>
-                    <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase border-2 border-black dark:border-neutral-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-none ${getStatusColor(tx.status)}`}>
-                      {tx.status?.toUpperCase() || 'PENDING'}
+                    <span className={`shrink-0 px-4 py-2 rounded-xl text-[11px] font-black capitalize border-2 border-black dark:border-neutral-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-none ${getStatusColor(tx.status)}`}>
+                      {tx.status ? String(tx.status).replace(/_/g, ' ').toLowerCase() : 'pending'}
                     </span>
                   </div>
                 </div>
@@ -258,11 +258,11 @@ export default function DashboardPage() {
             );
           })}
           {transactions.length === 0 && (
-            <div className="p-12 text-center">
+            <div className="p-10 md:p-14 text-center">
               <Package className="w-16 h-16 text-gray-300 dark:text-neutral-600 mx-auto mb-4" />
-              <p className="text-gray-400 dark:text-neutral-500 font-black uppercase tracking-widest">{t('dashHome.noTransactions')}</p>
-              <Link href="/marketplace" className="text-blue-600 hover:underline mt-2 inline-block">
-                {t('dashHome.startShopping')}
+              <p className="text-sm text-gray-400 dark:text-neutral-500 font-black uppercase tracking-widest">{t('dashHome.noTransactions')}</p>
+              <Link href="/marketplace" className="mt-5 inline-flex items-center justify-center gap-2 w-full md:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-sm tracking-widest rounded-2xl transition-colors">
+                {t('dashHome.startShopping')} <ArrowRight size={16} className="rtl:rotate-180" />
               </Link>
             </div>
           )}
@@ -278,35 +278,35 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500 mb-2">{t('dashHome.yourReferralCode')}</p>
+              <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500 mb-2">{t('dashHome.yourReferralCode')}</p>
               <div className="flex items-center gap-3">
-                <div className="flex-1 bg-gray-50 dark:bg-neutral-800 border-2 border-black dark:border-neutral-700 p-4 rounded-2xl font-black text-lg tracking-widest">
+                <div className="flex-1 min-w-0 truncate bg-gray-50 dark:bg-neutral-800 border-2 border-black dark:border-neutral-700 px-4 py-3.5 rounded-2xl font-black text-lg md:text-xl tracking-widest">
                   {user?.referral_code || 'N/A'}
                 </div>
                 <button
                   onClick={copyReferralCode}
                   title={t('dashHome.copyReferralLink')}
-                  className="p-4 bg-black dark:bg-neutral-800 text-white rounded-2xl hover:bg-blue-600 transition-all"
+                  className="shrink-0 p-4 bg-black dark:bg-neutral-800 text-white rounded-2xl hover:bg-blue-600 transition-all"
                 >
                   {copied ? <CheckCircle2 size={20} /> : <Copy size={20} />}
                 </button>
               </div>
               {referralLink && (
-                <p className="mt-2 text-[10px] font-bold text-gray-400 dark:text-neutral-500 break-all">
+                <p className="mt-2 text-[11px] font-bold text-gray-400 dark:text-neutral-500 break-all">
                   {copied ? t('dashHome.linkCopied') : referralLink}
                 </p>
               )}
             </div>
             <div>
-              <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500 mb-2">{t('dashHome.referralStats')}</p>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-bold text-gray-600 dark:text-neutral-300">{t('dashHome.totalReferrals')}</span>
-                  <span className="text-2xl font-black">{referralStats.total_referrals || 0}</span>
+              <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 dark:text-neutral-500 mb-2">{t('dashHome.referralStats')}</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-gray-50 dark:bg-neutral-800 border-2 border-black dark:border-neutral-700 rounded-2xl p-4">
+                  <span className="block text-[11px] font-black uppercase tracking-widest text-gray-500 dark:text-neutral-400 mb-1">{t('dashHome.totalReferrals')}</span>
+                  <span className="block text-2xl md:text-3xl font-black tracking-tighter leading-none">{referralStats.total_referrals || 0}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-bold text-gray-600 dark:text-neutral-300">{t('dashHome.totalEarnings')}</span>
-                  <span className="text-2xl font-black text-green-600">{formatIRRShort(referralStats.total_earnings || '0')} تومان</span>
+                <div className="bg-gray-50 dark:bg-neutral-800 border-2 border-black dark:border-neutral-700 rounded-2xl p-4">
+                  <span className="block text-[11px] font-black uppercase tracking-widest text-gray-500 dark:text-neutral-400 mb-1">{t('dashHome.totalEarnings')}</span>
+                  <span className="block text-xl md:text-2xl font-black tracking-tighter leading-none break-words text-green-600 dark:text-green-500">{formatIRRShort(referralStats.total_earnings || '0')} تومان</span>
                 </div>
               </div>
             </div>

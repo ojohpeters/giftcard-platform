@@ -176,7 +176,7 @@ export default function OrdersPage() {
   const UnifiedStatusBadge = ({ r }: { r: { status?: string; payment_status?: string } }) => {
     const st = getUnifiedStatus(r);
     return (
-      <div className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase border inline-flex items-center gap-1.5 ${st.color}`}>
+      <div className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase border inline-flex items-center gap-1.5 ${st.color}`}>
         {st.icon}
         {st.key ? t(`dashOrders.${st.key}`) : (r.status || '').replace(/_/g, ' ')}
       </div>
@@ -233,7 +233,7 @@ export default function OrdersPage() {
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <div className="h-1 w-4 bg-blue-600"></div>
-          <p className="text-[9px] font-black text-blue-600 uppercase tracking-[0.4em]">{t('dashOrders.transactionLogs')}</p>
+          <p className="text-[11px] font-black text-blue-600 uppercase tracking-[0.4em]">{t('dashOrders.transactionLogs')}</p>
         </div>
         <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-neutral-100 tracking-tighter italic uppercase leading-none">
           {t('dashOrders.headingOrders')}<span className="text-gray-200">/</span>{t('dashOrders.headingHistory')}
@@ -378,11 +378,11 @@ export default function OrdersPage() {
                 <table className="w-full min-w-[640px] text-left">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900">
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">{t('dashOrders.colOrderId')}</th>
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">{t('dashOrders.colDate')}</th>
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">{t('dashOrders.colItems')}</th>
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">{t('dashOrders.total')}</th>
-                      <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 text-center">{t('dashOrders.status')}</th>
+                      <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">{t('dashOrders.colOrderId')}</th>
+                      <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">{t('dashOrders.colDate')}</th>
+                      <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">{t('dashOrders.colItems')}</th>
+                      <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">{t('dashOrders.total')}</th>
+                      <th className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 text-center">{t('dashOrders.status')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-neutral-800">
@@ -401,7 +401,7 @@ export default function OrdersPage() {
                           <span className="font-bold">{formatIRRShort(order.total_iqd || '0')} تومان</span>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border inline-flex items-center gap-1.5 ${getStatusColor(order.status)}`}>
+                          <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase border inline-flex items-center gap-1.5 ${getStatusColor(order.status)}`}>
                             {getStatusIcon(order.status)}
                             {order.status}
                           </span>
@@ -435,34 +435,34 @@ export default function OrdersPage() {
 
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-gray-50 dark:bg-neutral-800 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('dashOrders.brand')}</p>
+                <p className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('dashOrders.brand')}</p>
                 <p className="text-sm font-medium">{selectedRequest.brand_name}</p>
               </div>
               <div className="bg-gray-50 dark:bg-neutral-800 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('dashOrders.country')}</p>
+                <p className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('dashOrders.country')}</p>
                 <p className="text-sm font-medium">{selectedRequest.country_name}</p>
               </div>
               <div className="bg-gray-50 dark:bg-neutral-800 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('dashOrders.cardType')}</p>
+                <p className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('dashOrders.cardType')}</p>
                 <p className="text-sm font-medium">{selectedRequest.card_type}</p>
               </div>
               <div className="bg-gray-50 dark:bg-neutral-800 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('dashOrders.amount')}</p>
+                <p className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('dashOrders.amount')}</p>
                 <p className="text-sm font-medium">${selectedRequest.amount} × {selectedRequest.quantity}</p>
               </div>
               <div className="bg-green-50 dark:bg-green-950/40 rounded-xl p-3 col-span-2">
-                <p className="text-[10px] font-bold text-green-600 uppercase mb-1">{t('dashOrders.totalIRR')}</p>
+                <p className="text-[11px] font-bold text-green-600 uppercase mb-1">{t('dashOrders.totalIRR')}</p>
                 <p className="text-lg font-bold text-green-700 dark:text-green-300">{formatIRRShort(selectedRequest.total_amount_irr ?? '0')} تومان</p>
               </div>
               <div className="bg-gray-50 dark:bg-neutral-800 rounded-xl p-3 col-span-2">
-                <p className="text-[10px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('dashOrders.status')}</p>
+                <p className="text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase mb-1">{t('dashOrders.status')}</p>
                 <UnifiedStatusBadge r={selectedRequest} />
               </div>
             </div>
 
             {selectedRequest.can_view_codes && selectedRequest.assigned_codes && selectedRequest.assigned_codes.length > 0 && (
               <div className="mb-4">
-                <p className="text-[10px] font-bold text-green-600 uppercase mb-2">{t('dashOrders.yourECodes')}</p>
+                <p className="text-[11px] font-bold text-green-600 uppercase mb-2">{t('dashOrders.yourECodes')}</p>
                 <div className="bg-green-50 border border-green-200 rounded-xl p-3 space-y-1">
                   {selectedRequest.assigned_codes.map((code, idx) => (
                     <code key={idx} className="block font-mono text-sm text-green-700">{code}</code>
