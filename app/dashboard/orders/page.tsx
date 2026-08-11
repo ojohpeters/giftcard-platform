@@ -163,6 +163,7 @@ export default function OrdersPage() {
   const getUnifiedStatus = (r: { status?: string; payment_status?: string }) => {
     const s = (r.status || '').toLowerCase();
     const p = (r.payment_status || '').toLowerCase();
+    if (p === 'refunded') return { key: 'stRefunded', color: BLUE, icon: <CreditCard size={12} className="text-blue-600" /> };
     if (s === 'rejected') return { key: 'stRejected', color: RED, icon: <XCircle size={12} className="text-red-600" /> };
     if (s === 'cancelled') return { key: 'stCancelled', color: GRAY, icon: <XCircle size={12} className="text-gray-500 dark:text-neutral-400" /> };
     if (s === 'completed') return { key: 'stCompleted', color: GREEN, icon: <CheckCircle2 size={12} className="text-green-600" /> };

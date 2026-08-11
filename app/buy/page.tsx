@@ -254,6 +254,21 @@ export default function BuyPage() {
       };
 
       const response = await ordersAPI.createPurchaseRequest(requestData);
+      const newId = response.data?.id;
+
+      // No admin pre-approval: take the customer straight to payment.
+      try {
+        const pay = await ordersAPI.initiatePayment(newId);
+        if (pay.data?.payment_url) {
+          window.location.href = pay.data.payment_url;   // off to the gateway
+          return;
+        }
+        // Dev bypass (no real gateway) → show the confirmation screen.
+      } catch (payErr) {
+        console.error('Payment init failed, showing order confirmation:', payErr);
+        // Fall through: they can retry via "Pay Now" on their orders page.
+      }
+
       setPurchaseRequest(response.data);
       setStep('confirm');
     } catch (error: any) {

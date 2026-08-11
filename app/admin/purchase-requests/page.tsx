@@ -103,13 +103,27 @@ export default function AdminPurchaseRequestsPage() {
     }
   };
 
+  // Ask for a reason (customer sees it) and reject. If the request was paid,
+  // the backend auto-refunds the amount to the customer's wallet.
+  const promptReject = (id: string, paid: boolean) => {
+    const reason = window.prompt(
+      paid
+        ? 'Reason for rejection — the customer sees this, and the amount they paid will be REFUNDED to their wallet:'
+        : 'Reason for rejection (the customer will see this):'
+    );
+    if (reason && reason.trim()) handleReject(id, reason.trim());
+  };
+
   const handleReject = async (id: string, reason: string) => {
     try {
       setActionLoading(id);
       setError('');
-      await adminAPI.rejectPurchaseRequest(id, reason);
+      const res = await adminAPI.rejectPurchaseRequest(id, reason);
       await loadRequests();
       setSelectedRequest(null);
+      if (res?.data?.refunded) {
+        alert('Request rejected. The amount the customer paid has been refunded to their wallet.');
+      }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { error?: string } } };
       console.error('Failed to reject request:', err);
@@ -376,7 +390,7 @@ export default function AdminPurchaseRequestsPage() {
                               )}
                             </button>
                             <button
-                              onClick={() => handleReject(request.id, 'Rejected by admin')}
+                              onClick={() => promptReject(request.id, request.payment_status === 'paid')}
                               disabled={actionLoading === request.id}
                               className="p-1.5 md:p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all disabled:opacity-50 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/40"
                               title="Reject"
@@ -400,16 +414,26 @@ export default function AdminPurchaseRequestsPage() {
                           </button>
                         )}
                         {request.payment_status === 'paid' && request.status !== 'completed' && (
-                          <button
-                            onClick={() => {
-                              setRequestForCodes(request.id);
-                              setShowCodesModal(true);
-                            }}
-                            className="p-1.5 md:p-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-all dark:bg-purple-950/40 dark:text-purple-300 dark:hover:bg-purple-900/40"
-                            title="Assign Codes"
-                          >
-                            <Gift size={14} className="md:w-4 md:h-4" />
-                          </button>
+                          <>
+                            <button
+                              onClick={() => {
+                                setRequestForCodes(request.id);
+                                setShowCodesModal(true);
+                              }}
+                              className="p-1.5 md:p-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-all dark:bg-purple-950/40 dark:text-purple-300 dark:hover:bg-purple-900/40"
+                              title="Assign codes (fulfill)"
+                            >
+                              <Gift size={14} className="md:w-4 md:h-4" />
+                            </button>
+                            <button
+                              onClick={() => promptReject(request.id, true)}
+                              disabled={actionLoading === request.id}
+                              className="p-1.5 md:p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all disabled:opacity-50 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/40"
+                              title="Reject & refund to wallet"
+                            >
+                              <Ban size={14} className="md:w-4 md:h-4" />
+                            </button>
+                          </>
                         )}
                       </div>
                     </td>
@@ -554,7 +578,7 @@ export default function AdminPurchaseRequestsPage() {
                   Approve
                 </button>
                 <button
-                  onClick={() => handleReject(selectedRequest.id, 'Rejected by admin')}
+                  onClick={() => promptReject(selectedRequest.id, selectedRequest.payment_status === 'paid')}
                   disabled={actionLoading === selectedRequest.id}
                   className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold uppercase text-sm hover:bg-red-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
@@ -580,16 +604,26 @@ export default function AdminPurchaseRequestsPage() {
             )}
 
             {selectedRequest.payment_status === 'paid' && selectedRequest.status !== 'completed' && (
-              <button
-                onClick={() => {
-                  setRequestForCodes(selectedRequest.id);
-                  setShowCodesModal(true);
-                }}
-                className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold uppercase text-sm hover:bg-purple-700 transition-all flex items-center justify-center gap-2"
-              >
-                <Gift size={18} />
-                Assign E-Codes
-              </button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => {
+                    setRequestForCodes(selectedRequest.id);
+                    setShowCodesModal(true);
+                  }}
+                  className="flex-1 py-3 bg-purple-600 text-white rounded-xl font-bold uppercase text-sm hover:bg-purple-700 transition-all flex items-center justify-center gap-2"
+                >
+                  <Gift size={18} />
+                  Assign E-Codes
+                </button>
+                <button
+                  onClick={() => promptReject(selectedRequest.id, true)}
+                  disabled={actionLoading === selectedRequest.id}
+                  className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold uppercase text-sm hover:bg-red-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  <Ban size={18} />
+                  Reject &amp; Refund
+                </button>
+              </div>
             )}
           </div>
         </div>
