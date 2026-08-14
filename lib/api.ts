@@ -155,6 +155,9 @@ export const authAPI = {
     api.post('/auth/sms/request/', { phone }),
   smsVerifyOtp: (phone: string, code: string) =>
     api.post('/auth/sms/verify/', { phone, code }),
+  // Phone-created accounts: add a real email + password to also log in by email.
+  linkEmail: (email: string, password: string) =>
+    api.post('/auth/link-email/', { email, password }),
   logout: () =>
     api.post('/auth/logout/'),
   getCurrentUser: () =>

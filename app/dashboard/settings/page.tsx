@@ -5,7 +5,7 @@ import {
   AlertCircle, CreditCard, Upload
 } from "lucide-react";
 import { useAuthStore } from '@/store/authStore';
-import { userAPI, kycAPI, walletAPI } from '@/lib/api';
+import { userAPI, kycAPI, walletAPI, authAPI } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
 
@@ -34,6 +34,28 @@ export default function SettingsPage() {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
+  // Email-login setup for phone-created accounts
+  const [linkEmailValue, setLinkEmailValue] = useState('');
+  const [linkPassword, setLinkPassword] = useState('');
+  const [linkSaving, setLinkSaving] = useState(false);
+  const [linkMsg, setLinkMsg] = useState('');
+  const [linkErr, setLinkErr] = useState('');
+
+  const handleLinkEmail = async () => {
+    setLinkErr(''); setLinkMsg('');
+    if (!linkEmailValue.trim() || !linkPassword) { setLinkErr(t('dashSettings.emailLoginNeed')); return; }
+    setLinkSaving(true);
+    try {
+      const res = await authAPI.linkEmail(linkEmailValue.trim(), linkPassword);
+      if (res.data?.user) updateUser(res.data.user);
+      setLinkMsg(res.data?.message || t('dashSettings.emailLoginSaved'));
+      setLinkPassword('');
+    } catch (e: any) {
+      setLinkErr(e.response?.data?.error || t('dashSettings.emailLoginFailed'));
+    } finally {
+      setLinkSaving(false);
+    }
+  };
 
   // ---- KYC state ----
   const [kyc, setKyc] = useState<any>(null);
@@ -283,6 +305,28 @@ export default function SettingsPage() {
               </div>
             </div>
           </section>
+
+          {/* Email login setup — only for phone-created accounts */}
+          {(user as any)?.is_phone_account && (
+            <section className="space-y-2">
+              <h3 className="text-[11px] font-black text-blue-600 uppercase tracking-widest px-1">{t('dashSettings.emailLoginTitle')}</h3>
+              <div className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-2xl md:rounded-[32px] p-5 md:p-6 space-y-4">
+                <p className="text-sm text-gray-500 dark:text-neutral-400">{t('dashSettings.emailLoginHint')}</p>
+                {linkMsg && <p className="text-xs text-green-600 dark:text-green-400 font-bold">{linkMsg}</p>}
+                {linkErr && <p className="text-xs text-red-600 dark:text-red-400 font-bold">{linkErr}</p>}
+                <div className="space-y-3">
+                  <input type="email" dir="ltr" value={linkEmailValue} onChange={(e) => setLinkEmailValue(e.target.value)} placeholder="you@example.com"
+                    className="w-full bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 dark:text-neutral-100 rounded-xl py-3.5 px-4 outline-none focus:border-blue-600 text-sm" />
+                  <input type="password" value={linkPassword} onChange={(e) => setLinkPassword(e.target.value)} autoComplete="new-password" placeholder={t('dashSettings.emailLoginPwPlaceholder')}
+                    className="w-full bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 dark:text-neutral-100 rounded-xl py-3.5 px-4 outline-none focus:border-blue-600 text-sm" />
+                </div>
+                <button onClick={handleLinkEmail} disabled={linkSaving}
+                  className="w-full md:w-auto py-3.5 md:px-8 bg-blue-600 text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                  <Save size={16} /> {linkSaving ? t('dashSettings.saving') : t('dashSettings.emailLoginSave')}
+                </button>
+              </div>
+            </section>
+          )}
 
           {/* 02. IDENTITY VERIFICATION (KYC) */}
           <section className="space-y-2">
