@@ -22,6 +22,7 @@ interface AuthState {
   isInitialized: boolean;
   login: (email: string, password: string, captchaToken?: string) => Promise<void>;
   register: (data: any) => Promise<void>;
+  smsVerify: (phone: string, code: string) => Promise<any>;
   logout: () => Promise<void>;
   fetchUser: () => Promise<void>;
   updateUser: (userData: User) => void;
@@ -94,6 +95,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // isAuthenticated here; the register page shows a "check your email" view.
       await authAPI.register(data);
       set({ isLoading: false });
+    } catch (error: any) {
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+
+  // SMS login: verify the OTP → the backend returns {user, tokens} (account
+  // created on the fly if new). Logs the user straight in.
+  smsVerify: async (phone: string, code: string) => {
+    set({ isLoading: true });
+    try {
+      const response = await authAPI.smsVerifyOtp(phone, code);
+      const { tokens, user } = response.data;
+      if (tokens && typeof window !== 'undefined') {
+        localStorage.setItem('access_token', tokens.access);
+        localStorage.setItem('refresh_token', tokens.refresh);
+      }
+      resetRefreshState();
+      set({ user, isAuthenticated: true, isLoading: false, isInitialized: true });
+      return response.data;
     } catch (error: any) {
       set({ isLoading: false });
       throw error;

@@ -148,6 +148,13 @@ export const authAPI = {
     api.post('/auth/login/', { email, password, turnstile_token: captchaToken }),
   register: (data: any) =>
     api.post('/auth/register/', data),
+  // SMS (sms.ir) phone login: request a code, then verify it to log in / sign up.
+  smsStatus: () =>
+    api.get('/auth/sms/status/'),
+  smsRequestOtp: (phone: string) =>
+    api.post('/auth/sms/request/', { phone }),
+  smsVerifyOtp: (phone: string, code: string) =>
+    api.post('/auth/sms/verify/', { phone, code }),
   logout: () =>
     api.post('/auth/logout/'),
   getCurrentUser: () =>

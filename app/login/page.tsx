@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Lock, Mail, ArrowRight, Eye, EyeOff, CheckCircle, Loader2 } from "lucide-react";
+import { Lock, Mail, ArrowRight, Eye, EyeOff, CheckCircle, Loader2, Phone } from "lucide-react";
 import { FaGoogle, FaDiscord } from 'react-icons/fa';
 import { useAuthStore } from '@/store/authStore';
 import { resetRefreshState, authAPI, userAPI } from '@/lib/api';
@@ -24,9 +24,69 @@ function LoginContent() {
   const [captchaToken, setCaptchaToken] = useState('');
   const turnstileRef = React.useRef<TurnstileHandle>(null);
   const login = useAuthStore((state) => state.login);
+  const smsVerify = useAuthStore((state) => state.smsVerify);
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isInitialized = useAuthStore((state) => state.isInitialized);
+
+  // SMS (phone OTP) login
+  const [smsEnabled, setSmsEnabled] = useState(false);
+  const [authMode, setAuthMode] = useState<'email' | 'sms'>('email');
+  const [phone, setPhone] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [smsLoading, setSmsLoading] = useState(false);
+  const [smsError, setSmsError] = useState('');
+  const [resendIn, setResendIn] = useState(0);
+
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const id = setTimeout(() => setResendIn((s) => s - 1), 1000);
+    return () => clearTimeout(id);
+  }, [resendIn]);
+
+  // Show the SMS-login option only when the backend has sms.ir configured.
+  useEffect(() => {
+    authAPI.smsStatus().then((r) => setSmsEnabled(!!r.data?.enabled)).catch(() => setSmsEnabled(false));
+  }, []);
+
+  const goAfterLogin = () => {
+    const redirect = searchParams.get('redirect');
+    const currentUser = useAuthStore.getState().user;
+    if (currentUser?.is_staff) router.push('/admin');
+    else if (redirect) router.push(redirect);
+    else router.push('/dashboard');
+  };
+
+  const handleSendOtp = async () => {
+    setSmsError(''); setError('');
+    if (!phone.trim()) { setSmsError(t('login.enterPhone')); return; }
+    setSmsLoading(true);
+    try {
+      const res = await authAPI.smsRequestOtp(phone.trim());
+      setOtpSent(true);
+      setResendIn(Math.min(res.data?.expires_in || 60, 60));
+    } catch (err: any) {
+      setSmsError(err.response?.data?.error || t('login.smsFailed'));
+    } finally {
+      setSmsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setSmsError('');
+    if (otpCode.trim().length < 4) { setSmsError(t('login.enterCode')); return; }
+    setSmsLoading(true);
+    try {
+      await smsVerify(phone.trim(), otpCode.trim());
+      await new Promise((r) => setTimeout(r, 150));
+      goAfterLogin();
+    } catch (err: any) {
+      setSmsError(err.response?.data?.error || t('login.invalidCode'));
+    } finally {
+      setSmsLoading(false);
+    }
+  };
 
   const handleResendVerification = async () => {
     if (!email) return;
@@ -226,6 +286,99 @@ function LoginContent() {
           </div>
         )}
 
+        {/* Auth mode toggle: Email / Phone (SMS) — only when SMS is configured */}
+        {smsEnabled && (
+        <div className="flex gap-1 mb-6 bg-gray-100 dark:bg-neutral-800 p-1 rounded-2xl">
+          <button
+            type="button"
+            onClick={() => { setAuthMode('email'); setError(''); setSmsError(''); }}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${authMode === 'email' ? 'bg-white dark:bg-neutral-900 text-blue-600 shadow-sm' : 'text-gray-500 dark:text-neutral-400'}`}
+          >
+            <Mail size={16} /> {t('login.tabEmail')}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setAuthMode('sms'); setError(''); setSmsError(''); }}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${authMode === 'sms' ? 'bg-white dark:bg-neutral-900 text-blue-600 shadow-sm' : 'text-gray-500 dark:text-neutral-400'}`}
+          >
+            <Phone size={16} /> {t('login.tabSms')}
+          </button>
+        </div>
+        )}
+
+        {smsEnabled && authMode === 'sms' ? (
+          <div className="space-y-6">
+            {!otpSent ? (
+              <>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500 ml-1">{t('login.phoneLabel')}</label>
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-neutral-500 w-5 h-5" />
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      dir="ltr"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleSendOtp(); }}
+                      placeholder="09123456789"
+                      className="w-full bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 dark:text-neutral-100 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all text-sm"
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-400 dark:text-neutral-500 px-1">{t('login.smsHint')}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  disabled={smsLoading || !phone.trim()}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-100 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                >
+                  {smsLoading ? <Loader2 size={20} className="animate-spin" /> : null}
+                  {smsLoading ? t('login.sendingCode') : t('login.sendCode')} {!smsLoading && <ArrowRight size={20} />}
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-gray-500 dark:text-neutral-400 text-center">
+                  {t('login.codeSentTo')} <span dir="ltr" className="font-bold text-gray-700 dark:text-neutral-200">{phone}</span>
+                </p>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-500 ml-1">{t('login.codeLabel')}</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    dir="ltr"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleVerifyOtp(); }}
+                    placeholder="·····"
+                    className="w-full bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 dark:text-neutral-100 rounded-2xl py-4 px-4 outline-none focus:border-blue-600 text-center text-2xl font-black tracking-[0.5em]"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleVerifyOtp}
+                  disabled={smsLoading || otpCode.length < 4}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-100 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                >
+                  {smsLoading ? <Loader2 size={20} className="animate-spin" /> : null}
+                  {smsLoading ? t('login.verifying') : t('login.verifyLogin')} {!smsLoading && <ArrowRight size={20} />}
+                </button>
+                <div className="flex items-center justify-between text-xs">
+                  <button type="button" onClick={() => { setOtpSent(false); setOtpCode(''); setSmsError(''); }} className="font-bold text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200">
+                    {t('login.changeNumber')}
+                  </button>
+                  <button type="button" onClick={handleSendOtp} disabled={resendIn > 0 || smsLoading} className="font-bold text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed">
+                    {resendIn > 0 ? `${t('login.resendIn')} ${resendIn}s` : t('login.resendCode')}
+                  </button>
+                </div>
+              </>
+            )}
+            {smsError && <p className="text-xs text-red-600 dark:text-red-400 font-bold text-center">{smsError}</p>}
+          </div>
+        ) : (
+        <>
         {/* Form */}
         <form className="space-y-6" onSubmit={async (e) => {
           e.preventDefault();
@@ -362,6 +515,8 @@ function LoginContent() {
             <span className="text-sm">Discord</span>
           </button>
         </div>
+        </>
+        )}
 
         {/* Footer */}
         <div className="mt-10 text-center">
