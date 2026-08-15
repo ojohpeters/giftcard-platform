@@ -12,7 +12,8 @@ import {
   Gift,
   Upload,
   Boxes,
-  Tag
+  Tag,
+  ShoppingCart
 } from "lucide-react";
 import { useAuthStore } from '@/store/authStore';
 import { userAPI } from '@/lib/api';
@@ -96,6 +97,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <NavLink href="/dashboard/codes" icon={Gift} label={t('dashNav.giftCodes')} />
               <NavLink href="/dashboard/inventory" icon={Boxes} label={t('dashNav.inventory')} />
               <NavLink href="/dashboard/listings" icon={Tag} label={t('dashNav.listings')} />
+              <NavLink href="/dashboard/purchases" icon={ShoppingCart} label={t('dashNav.purchases')} />
             </div>
           </div>
           

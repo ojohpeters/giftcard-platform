@@ -22,6 +22,7 @@ export default function SkinDetailPage() {
   const [item, setItem] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState('');
+  const [buying, setBuying] = useState(false);
 
   useEffect(() => {
     if (!ref) return;
@@ -31,10 +32,19 @@ export default function SkinDetailPage() {
       .finally(() => setLoading(false));
   }, [ref]);
 
-  const handleBuy = () => {
+  const handleBuy = async () => {
     if (!isAuthenticated) { router.push(`/login?redirect=/skins/${ref}`); return; }
-    // Phase 4: checkout + payment + escrow trade. Stubbed for now.
-    setNotice('Buying opens soon — checkout & secure trade are coming in the next phase.');
+    setNotice(''); setBuying(true);
+    try {
+      const res = await steamAPI.buyNow(ref);
+      if (res.data?.payment_url) { window.location.href = res.data.payment_url; return; }  // → Zarinpal
+      if (res.data?.dev_bypass) { router.push('/dashboard/purchases?paid=1'); return; }
+      setNotice('Could not start checkout. Please try again.');
+    } catch (e: any) {
+      setNotice(e.response?.data?.error || 'Could not start checkout.');
+    } finally {
+      setBuying(false);
+    }
   };
 
   if (loading) return <div className="min-h-[50vh] flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>;
@@ -92,8 +102,8 @@ export default function SkinDetailPage() {
           <div className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-2xl p-5">
             <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Price</p>
             <p className="text-3xl font-black text-green-600 mb-4">{Number(item.price).toLocaleString()} تومان</p>
-            <button onClick={handleBuy} className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase text-sm tracking-widest py-4 rounded-2xl transition-all">
-              <ShoppingCart size={18} /> Buy Now
+            <button onClick={handleBuy} disabled={buying} className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-black uppercase text-sm tracking-widest py-4 rounded-2xl transition-all">
+              {buying ? <Loader2 size={18} className="animate-spin" /> : <ShoppingCart size={18} />} Buy Now
             </button>
             {notice && <p className="text-xs text-blue-600 dark:text-blue-400 font-bold mt-3 text-center">{notice}</p>}
             <p className="text-[11px] text-gray-400 dark:text-neutral-500 mt-3 text-center">Your item stays with the seller until you pay; HiGc then handles the secure Steam trade.</p>

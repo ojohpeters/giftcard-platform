@@ -72,6 +72,7 @@ export default function Header() {
     { name: t("dashNav.giftCodes"), href: "/dashboard/codes", icon: Gift },
     { name: t("dashNav.inventory"), href: "/dashboard/inventory", icon: Boxes },
     { name: t("dashNav.listings"), href: "/dashboard/listings", icon: Tag },
+    { name: t("dashNav.purchases"), href: "/dashboard/purchases", icon: ShoppingCart },
     { name: t("dashNav.payout"), href: "/dashboard/withdraw", icon: ArrowUpRight },
     { name: t("dashNav.settings"), href: "/dashboard/settings", icon: Settings },
   ];

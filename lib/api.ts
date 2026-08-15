@@ -325,6 +325,10 @@ export const steamAPI = {
   cancelListing: (ref: string) => api.delete(`/steam/listings/${ref}/`),
   market: (params?: any) => api.get('/steam/market/', { params }),
   marketItem: (ref: string) => api.get(`/steam/market/${ref}/`),
+  // Phase 4: buy + orders
+  buyNow: (ref: string) => api.post(`/steam/market/${ref}/buy/`),
+  myOrders: () => api.get('/steam/orders/my/'),
+  orderDetail: (ref: string) => api.get(`/steam/orders/${ref}/`),
   sync: () => api.post('/steam/sync/'),
   disconnect: () => api.post('/steam/disconnect/'),
 };
