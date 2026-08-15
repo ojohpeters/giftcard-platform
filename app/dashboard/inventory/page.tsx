@@ -56,6 +56,34 @@ export default function SteamInventoryPage() {
   const [tradableOnly, setTradableOnly] = useState(false);
   const [stOnly, setStOnly] = useState(false);
 
+  // Sell modal
+  const [sellItem, setSellItem] = useState<Item | null>(null);
+  const [sellPrice, setSellPrice] = useState('');
+  const [commissionPct, setCommissionPct] = useState(5);
+  const [listing, setListing] = useState(false);
+  const [listErr, setListErr] = useState('');
+
+  useEffect(() => { steamAPI.commission().then((r) => setCommissionPct(r.data?.commission_percent ?? 5)).catch(() => {}); }, []);
+
+  const priceNum = parseFloat(sellPrice) || 0;
+  const feeAmount = Math.round(priceNum * commissionPct / 100);
+  const payout = Math.max(priceNum - feeAmount, 0);
+
+  const submitListing = async () => {
+    setListErr('');
+    if (!sellItem || priceNum <= 0) { setListErr('Enter a valid price.'); return; }
+    setListing(true);
+    try {
+      await steamAPI.createListing({ asset_id: sellItem.asset_id, price: priceNum });
+      setSellItem(null);
+      await load(false);
+    } catch (e: any) {
+      setListErr(e.response?.data?.error || 'Could not create listing.');
+    } finally {
+      setListing(false);
+    }
+  };
+
   useEffect(() => {
     if (!isInitialized) return;
     if (!isAuthenticated) { router.push('/login?redirect=/dashboard/inventory'); return; }
@@ -187,8 +215,13 @@ export default function SteamInventoryPage() {
                     </div>
                     <div className="mt-auto pt-2 flex items-center justify-between">
                       <span className={`text-[9px] font-black uppercase ${it.tradable ? 'text-green-600' : 'text-gray-400'}`}>{it.tradable ? 'Tradable' : 'Locked'}</span>
-                      <button disabled title="Selling opens soon" className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wide text-gray-400 dark:text-neutral-600 cursor-not-allowed">
-                        <Tag size={11} /> Sell soon
+                      <button
+                        onClick={() => { setSellItem(it); setSellPrice(''); setListErr(''); }}
+                        disabled={!it.tradable}
+                        title={it.tradable ? 'List for sale' : 'Not tradable'}
+                        className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wide ${it.tradable ? 'text-blue-600 hover:text-blue-700' : 'text-gray-300 dark:text-neutral-600 cursor-not-allowed'}`}
+                      >
+                        <Tag size={11} /> Sell
                       </button>
                     </div>
                   </div>
@@ -197,6 +230,42 @@ export default function SteamInventoryPage() {
             </div>
           )}
         </>
+      )}
+
+      {/* SELL MODAL */}
+      {sellItem && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSellItem(null)}>
+          <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-xl font-black uppercase mb-4">List for Sale</h2>
+            <div className="flex items-center gap-3 mb-4 bg-gray-50 dark:bg-neutral-800 rounded-2xl p-3" style={{ borderLeft: `3px solid ${rarityColor(sellItem.rarity)}` }}>
+              {sellItem.icon_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={sellItem.icon_url} alt="" className="w-16 h-16 object-contain" />
+              )}
+              <div className="min-w-0">
+                <p className="text-sm font-black leading-tight line-clamp-2">{sellItem.market_name}</p>
+                <p className="text-[11px] text-gray-400">{sellItem.exterior}{sellItem.stattrak ? ' · StatTrak™' : ''}</p>
+              </div>
+            </div>
+            <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Your price (تومان)</label>
+            <input type="number" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)} placeholder="0" min="0" step="1000" autoFocus
+              className="mt-1 w-full bg-gray-50 dark:bg-neutral-800 dark:text-neutral-100 border-0 rounded-2xl py-4 px-4 text-2xl font-black outline-none focus:ring-2 focus:ring-blue-600" />
+
+            <div className="mt-4 space-y-2 text-sm bg-gray-50 dark:bg-neutral-800 rounded-2xl p-4">
+              <div className="flex justify-between"><span className="text-gray-500 dark:text-neutral-400">Selling price</span><span className="font-bold">{priceNum.toLocaleString()} تومان</span></div>
+              <div className="flex justify-between"><span className="text-gray-500 dark:text-neutral-400">HiGc fee ({commissionPct}%)</span><span className="font-bold text-red-500">−{feeAmount.toLocaleString()} تومان</span></div>
+              <div className="flex justify-between pt-2 border-t border-gray-200 dark:border-neutral-700"><span className="font-black uppercase text-xs">You receive</span><span className="font-black text-green-600">{payout.toLocaleString()} تومان</span></div>
+            </div>
+            {listErr && <p className="mt-3 text-xs text-red-600 dark:text-red-400 font-bold">{listErr}</p>}
+
+            <div className="flex gap-3 mt-5">
+              <button onClick={() => setSellItem(null)} className="flex-1 py-3.5 rounded-2xl font-black uppercase text-sm bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-300">Cancel</button>
+              <button onClick={submitListing} disabled={listing || priceNum <= 0} className="flex-1 py-3.5 rounded-2xl font-black uppercase text-sm bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2">
+                {listing ? <Loader2 size={18} className="animate-spin" /> : null} List Item
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

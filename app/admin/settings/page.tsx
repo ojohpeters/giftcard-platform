@@ -48,6 +48,10 @@ export default function AdminSettingsPage() {
   // Referral reward state
   const [referralReward, setReferralReward] = useState('');
   const [currentReferralReward, setCurrentReferralReward] = useState<number | null>(null);
+  // Steam marketplace commission
+  const [commission, setCommission] = useState('');
+  const [currentCommission, setCurrentCommission] = useState<number | null>(null);
+  const [loadingCommission, setLoadingCommission] = useState(false);
   const [loadingReferral, setLoadingReferral] = useState(false);
 
   useEffect(() => {
@@ -61,7 +65,30 @@ export default function AdminSettingsPage() {
     loadIrrHistory();
     // Load referral reward
     loadReferralReward();
+    loadCommission();
   }, [user, router]);
+
+  const loadCommission = async () => {
+    try {
+      const r = await adminAPI.getMarketplaceCommission();
+      const p = r.data?.commission_percent ?? 5;
+      setCurrentCommission(p); setCommission(String(p));
+    } catch { setCurrentCommission(5); setCommission('5'); }
+  };
+
+  const handleUpdateCommission = async () => {
+    const pct = parseFloat(commission);
+    if (isNaN(pct) || pct < 0 || pct > 100) { setError('Enter a commission between 0 and 100.'); return; }
+    setLoadingCommission(true); setError(''); setSuccess('');
+    try {
+      await adminAPI.updateMarketplaceCommission(pct);
+      setCurrentCommission(pct);
+      setSuccess(`Marketplace commission set to ${pct}%`);
+      setTimeout(() => setSuccess(''), 5000);
+    } catch (e: any) {
+      setError(e.response?.data?.error || 'Failed to update commission.');
+    } finally { setLoadingCommission(false); }
+  };
 
   const loadReferralReward = async () => {
     try {
@@ -531,6 +558,36 @@ export default function AdminSettingsPage() {
                 <ArrowRight size={18} />
               </>
             )}
+          </button>
+        </div>
+      </div>
+
+      {/* STEAM MARKETPLACE COMMISSION CARD */}
+      <div className="bg-white dark:bg-neutral-900 border-2 border-gray-200 dark:border-neutral-700 rounded-3xl p-8 shadow-xl">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 bg-gradient-to-br from-slate-700 to-slate-900 rounded-2xl flex items-center justify-center shadow-lg">
+            <Calculator className="text-white" size={30} />
+          </div>
+          <div>
+            <h2 className="text-2xl font-black uppercase text-gray-900 dark:text-neutral-100">Marketplace Commission</h2>
+            <p className="text-[10px] font-bold text-gray-500 dark:text-neutral-400 uppercase tracking-widest mt-1">Fee taken from each Steam-skin sale</p>
+          </div>
+        </div>
+        {currentCommission !== null && (
+          <div className="bg-slate-50 dark:bg-neutral-800 border-2 border-slate-200 dark:border-neutral-700 rounded-2xl p-6 mb-6">
+            <p className="text-[10px] font-black text-slate-500 dark:text-neutral-400 uppercase tracking-widest mb-2">Current Commission</p>
+            <p className="text-4xl font-black tabular-nums text-gray-900 dark:text-neutral-100">{currentCommission}%</p>
+          </div>
+        )}
+        <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
+          <div className="flex-1">
+            <label className="text-[10px] font-black text-gray-700 dark:text-neutral-300 uppercase tracking-widest mb-2 block">New Commission (%)</label>
+            <input type="number" value={commission} onChange={(e) => setCommission(e.target.value)} min="0" max="100" step="0.5" placeholder="5"
+              className="w-full bg-gray-50 dark:bg-neutral-800 border-2 border-gray-200 dark:border-neutral-700 rounded-2xl py-4 px-6 outline-none focus:border-slate-600 text-2xl font-black tabular-nums dark:text-neutral-100" />
+          </div>
+          <button onClick={handleUpdateCommission} disabled={loadingCommission || commission === '' || parseFloat(commission) === currentCommission}
+            className="py-4 px-8 bg-gradient-to-r from-slate-700 to-slate-900 text-white rounded-2xl font-black uppercase text-sm tracking-widest hover:from-slate-800 hover:to-black disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+            {loadingCommission ? <RefreshCw className="animate-spin" size={20} /> : <Save size={20} />} Save
           </button>
         </div>
       </div>

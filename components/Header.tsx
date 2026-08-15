@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   Menu, X, Zap, ArrowUpRight, Globe, LayoutDashboard, ShoppingCart,
   Shield, Home, ShoppingBag, Upload, LogOut, CheckCircle2, AlertCircle, ChevronRight, Lock, Newspaper,
-  History, MessageSquare, Gift, Settings, Wallet, Boxes,
+  History, MessageSquare, Gift, Settings, Wallet, Boxes, Tag,
 } from "lucide-react";
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
@@ -60,6 +60,7 @@ export default function Header() {
     { name: t("nav.blog"), href: "/blog", icon: Newspaper, authRequired: false },
     { name: t("nav.buy"), href: "/buy", icon: ShoppingBag, authRequired: true },
     { name: t("nav.sell"), href: "/sell", icon: Upload, authRequired: true },
+    { name: t("nav.skins"), href: "/skins", icon: Boxes, authRequired: false },
   ];
 
   // Full parity with the desktop dashboard sidebar so mobile users get every section.
@@ -70,6 +71,7 @@ export default function Header() {
     { name: t("dashNav.support"), href: "/dashboard/support", icon: MessageSquare },
     { name: t("dashNav.giftCodes"), href: "/dashboard/codes", icon: Gift },
     { name: t("dashNav.inventory"), href: "/dashboard/inventory", icon: Boxes },
+    { name: t("dashNav.listings"), href: "/dashboard/listings", icon: Tag },
     { name: t("dashNav.payout"), href: "/dashboard/withdraw", icon: ArrowUpRight },
     { name: t("dashNav.settings"), href: "/dashboard/settings", icon: Settings },
   ];

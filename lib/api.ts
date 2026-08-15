@@ -317,6 +317,14 @@ export const steamAPI = {
   account: () => api.get('/steam/account/'),
   inventory: (refresh = false) => api.get('/steam/inventory/', { params: refresh ? { refresh: 1 } : {} }),
   updateTradeUrl: (trade_url: string) => api.post('/steam/trade-url/', { trade_url }),
+  // Phase 3: listings + marketplace
+  commission: () => api.get('/steam/commission/'),
+  createListing: (data: { asset_id: string; price: number; app_id?: string; context_id?: string }) =>
+    api.post('/steam/listings/', data),
+  myListings: (status?: string) => api.get('/steam/listings/my/', { params: status ? { status } : {} }),
+  cancelListing: (ref: string) => api.delete(`/steam/listings/${ref}/`),
+  market: (params?: any) => api.get('/steam/market/', { params }),
+  marketItem: (ref: string) => api.get(`/steam/market/${ref}/`),
   sync: () => api.post('/steam/sync/'),
   disconnect: () => api.post('/steam/disconnect/'),
 };
@@ -452,6 +460,11 @@ export const adminAPI = {
     api.get('/admin/dashboard/get_referral_reward/'),
   updateReferralReward: (amount: number) =>
     api.post('/admin/dashboard/update_referral_reward/', { amount }),
+  // Steam marketplace commission
+  getMarketplaceCommission: () =>
+    api.get('/admin/dashboard/get_marketplace_commission/'),
+  updateMarketplaceCommission: (commission_percent: number) =>
+    api.post('/admin/dashboard/update_marketplace_commission/', { commission_percent }),
 
   uploadCodes: (productId: number, codes: any[]) =>
     api.post('/admin/dashboard/upload_codes/', { product_id: productId, codes }),
