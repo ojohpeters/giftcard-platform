@@ -310,6 +310,16 @@ export const referralsAPI = {
     api.get('/referrals/code/'),
 };
 
+// Steam marketplace (Phase 1: auth + account)
+export const steamAPI = {
+  // Returns { redirect_to } — send the browser there to start Steam OpenID.
+  login: () => api.get('/steam/login/'),
+  account: () => api.get('/steam/account/'),
+  updateTradeUrl: (trade_url: string) => api.post('/steam/trade-url/', { trade_url }),
+  sync: () => api.post('/steam/sync/'),
+  disconnect: () => api.post('/steam/disconnect/'),
+};
+
 // Discounts endpoints
 export const discountsAPI = {
   // Validate a code against an order amount (returns discount_amount + new_total)

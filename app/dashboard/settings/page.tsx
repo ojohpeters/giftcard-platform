@@ -4,8 +4,9 @@ import {
   ChevronRight, Mail, Save, Lock, ShieldCheck, CheckCircle2, Clock,
   AlertCircle, CreditCard, Upload
 } from "lucide-react";
+import { FaSteam } from 'react-icons/fa';
 import { useAuthStore } from '@/store/authStore';
-import { userAPI, kycAPI, walletAPI, authAPI } from '@/lib/api';
+import { userAPI, kycAPI, walletAPI, authAPI, steamAPI } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
 
@@ -40,6 +41,56 @@ export default function SettingsPage() {
   const [linkSaving, setLinkSaving] = useState(false);
   const [linkMsg, setLinkMsg] = useState('');
   const [linkErr, setLinkErr] = useState('');
+
+  // Steam account
+  const [steam, setSteam] = useState<any>(null);
+  const [steamLoaded, setSteamLoaded] = useState(false);
+  const [tradeUrl, setTradeUrl] = useState('');
+  const [steamMsg, setSteamMsg] = useState('');
+  const [steamErr, setSteamErr] = useState('');
+  const [steamBusy, setSteamBusy] = useState(false);
+
+  const loadSteam = async () => {
+    try {
+      const res = await steamAPI.account();
+      if (res.data?.connected) { setSteam(res.data); setTradeUrl(res.data.trade_url || ''); }
+      else setSteam(null);
+    } catch { setSteam(null); }
+    finally { setSteamLoaded(true); }
+  };
+
+  const handleConnectSteam = async () => {
+    setSteamErr('');
+    try {
+      const res = await steamAPI.login();
+      if (res.data?.redirect_to) window.location.href = res.data.redirect_to;
+    } catch { setSteamErr('Could not start Steam connection.'); }
+  };
+
+  const handleSaveTradeUrl = async () => {
+    setSteamErr(''); setSteamMsg(''); setSteamBusy(true);
+    try {
+      const res = await steamAPI.updateTradeUrl(tradeUrl.trim());
+      setSteam((s: any) => ({ ...s, ...res.data }));
+      setSteamMsg('Trade URL saved.');
+    } catch (e: any) { setSteamErr(e.response?.data?.error || 'Could not save Trade URL.'); }
+    finally { setSteamBusy(false); }
+  };
+
+  const handleSyncSteam = async () => {
+    setSteamErr(''); setSteamMsg(''); setSteamBusy(true);
+    try { const res = await steamAPI.sync(); setSteam((s: any) => ({ ...s, ...res.data })); setSteamMsg('Steam profile refreshed.'); }
+    catch { setSteamErr('Could not refresh from Steam.'); }
+    finally { setSteamBusy(false); }
+  };
+
+  const handleDisconnectSteam = async () => {
+    if (!confirm('Disconnect your Steam account?')) return;
+    setSteamBusy(true);
+    try { await steamAPI.disconnect(); setSteam(null); setTradeUrl(''); }
+    catch { setSteamErr('Could not disconnect.'); }
+    finally { setSteamBusy(false); }
+  };
 
   const handleLinkEmail = async () => {
     setLinkErr(''); setLinkMsg('');
@@ -90,6 +141,8 @@ export default function SettingsPage() {
       setKycForm((f) => ({ ...f, first_name: user.first_name || '', last_name: user.last_name || '' }));
     }
   }, [user]);
+
+  useEffect(() => { loadSteam(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
 
   useEffect(() => {
     // Load KYC status
@@ -327,6 +380,57 @@ export default function SettingsPage() {
               </div>
             </section>
           )}
+
+          {/* Steam Account */}
+          <section className="space-y-2">
+            <h3 className="text-[11px] font-black text-blue-600 uppercase tracking-widest px-1">Steam Account</h3>
+            <div className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 rounded-2xl md:rounded-[32px] p-5 md:p-6 space-y-4">
+              {steamMsg && <p className="text-xs text-green-600 dark:text-green-400 font-bold">{steamMsg}</p>}
+              {steamErr && <p className="text-xs text-red-600 dark:text-red-400 font-bold">{steamErr}</p>}
+              {!steamLoaded ? (
+                <p className="text-sm text-gray-400 dark:text-neutral-500">Loading…</p>
+              ) : !steam ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-500 dark:text-neutral-400">Connect your Steam account to sell and trade CS2 skins on HiGc. We use Steam&apos;s official sign-in — we never see your password.</p>
+                  <button onClick={handleConnectSteam} className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#1b2838] hover:bg-[#2a475e] text-white font-bold py-3.5 md:px-8 rounded-xl transition-all">
+                    <FaSteam /> Connect Steam
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-4">
+                    {steam.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={steam.avatar_url} alt="" className="w-16 h-16 rounded-2xl object-cover" />
+                    ) : (
+                      <div className="w-16 h-16 rounded-2xl bg-[#1b2838] flex items-center justify-center"><FaSteam className="text-white text-2xl" /></div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-base font-black text-gray-900 dark:text-neutral-100 truncate">{steam.persona_name || 'Steam user'}</p>
+                      <p className="text-[11px] text-gray-400 dark:text-neutral-500 font-mono truncate">{steam.steam_id}</p>
+                      {steam.profile_url && <a href={steam.profile_url} target="_blank" rel="noreferrer" className="text-[11px] font-bold text-blue-600 hover:underline">View Steam profile</a>}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-[11px] font-black uppercase px-2 py-1 rounded-full bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300">Connected</span>
+                    <span className="text-[11px] font-black uppercase px-2 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-neutral-300">Inventory: {steam.inventory_status}</span>
+                    <span className="text-[11px] font-black uppercase px-2 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-neutral-300">Trade: {steam.trade_status}</span>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-black text-gray-400 dark:text-neutral-500 uppercase tracking-widest">Steam Trade URL</label>
+                    <input dir="ltr" value={tradeUrl} onChange={(e) => setTradeUrl(e.target.value)} placeholder="https://steamcommunity.com/tradeoffer/new/?partner=...&token=..."
+                      className="w-full bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 dark:text-neutral-100 rounded-xl py-3.5 px-4 outline-none focus:border-blue-600 text-sm" />
+                    <p className="text-[11px] text-gray-400 dark:text-neutral-500">Needed later so items can be sent to you. Steam → Inventory → Trade Offers → &quot;Who can send me Trade Offers?&quot;</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={handleSaveTradeUrl} disabled={steamBusy} className="py-3 px-5 bg-blue-600 text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-blue-700 disabled:opacity-50 transition-all">Save Trade URL</button>
+                    <button onClick={handleSyncSteam} disabled={steamBusy} className="py-3 px-5 bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-neutral-200 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-gray-200 dark:hover:bg-neutral-700 disabled:opacity-50 transition-all">Refresh</button>
+                    <button onClick={handleDisconnectSteam} disabled={steamBusy} className="py-3 px-5 text-red-600 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-red-50 dark:hover:bg-red-950/40 disabled:opacity-50 transition-all">Disconnect</button>
+                  </div>
+                </>
+              )}
+            </div>
+          </section>
 
           {/* 02. IDENTITY VERIFICATION (KYC) */}
           <section className="space-y-2">

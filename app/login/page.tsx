@@ -2,9 +2,9 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, Mail, ArrowRight, Eye, EyeOff, CheckCircle, Loader2, Phone } from "lucide-react";
-import { FaGoogle, FaDiscord } from 'react-icons/fa';
+import { FaGoogle, FaDiscord, FaSteam } from 'react-icons/fa';
 import { useAuthStore } from '@/store/authStore';
-import { resetRefreshState, authAPI, userAPI } from '@/lib/api';
+import { resetRefreshState, authAPI, userAPI, steamAPI } from '@/lib/api';
 import Turnstile, { TURNSTILE_ENABLED, TurnstileHandle } from '@/components/Turnstile';
 import { useI18n } from '@/lib/i18n';
 
@@ -56,6 +56,17 @@ function LoginContent() {
     if (currentUser?.is_staff) router.push('/admin');
     else if (redirect) router.push(redirect);
     else router.push('/dashboard');
+  };
+
+  const handleSteamLogin = async () => {
+    setError('');
+    try {
+      const res = await steamAPI.login();
+      if (res.data?.redirect_to) window.location.href = res.data.redirect_to;
+      else setError('Could not start Steam sign-in.');
+    } catch {
+      setError('Could not start Steam sign-in.');
+    }
   };
 
   const handleSendOtp = async () => {
@@ -515,6 +526,16 @@ function LoginContent() {
             <span className="text-sm">Discord</span>
           </button>
         </div>
+
+        {/* Continue with Steam */}
+        <button
+          type="button"
+          onClick={handleSteamLogin}
+          className="mt-4 w-full flex items-center justify-center gap-3 bg-[#1b2838] hover:bg-[#2a475e] text-white font-bold py-3.5 rounded-2xl transition-all active:scale-[0.98]"
+        >
+          <FaSteam className="text-xl" />
+          <span className="text-sm">{t('login.continueSteam')}</span>
+        </button>
         </>
         )}
 
