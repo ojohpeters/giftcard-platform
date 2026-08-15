@@ -10,7 +10,8 @@ import {
   Wallet,
   MessageSquare,
   Gift,
-  Upload
+  Upload,
+  Boxes
 } from "lucide-react";
 import { useAuthStore } from '@/store/authStore';
 import { userAPI } from '@/lib/api';
@@ -92,6 +93,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <NavLink href="/dashboard/submissions" icon={Upload} label={t('dashNav.submissions')} />
               <NavLink href="/dashboard/support" icon={MessageSquare} label={t('dashNav.support')} />
               <NavLink href="/dashboard/codes" icon={Gift} label={t('dashNav.giftCodes')} />
+              <NavLink href="/dashboard/inventory" icon={Boxes} label={t('dashNav.inventory')} />
             </div>
           </div>
           

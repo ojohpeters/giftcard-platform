@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   Menu, X, Zap, ArrowUpRight, Globe, LayoutDashboard, ShoppingCart,
   Shield, Home, ShoppingBag, Upload, LogOut, CheckCircle2, AlertCircle, ChevronRight, Lock, Newspaper,
-  History, MessageSquare, Gift, Settings, Wallet,
+  History, MessageSquare, Gift, Settings, Wallet, Boxes,
 } from "lucide-react";
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
@@ -69,6 +69,7 @@ export default function Header() {
     { name: t("dashNav.submissions"), href: "/dashboard/submissions", icon: Upload },
     { name: t("dashNav.support"), href: "/dashboard/support", icon: MessageSquare },
     { name: t("dashNav.giftCodes"), href: "/dashboard/codes", icon: Gift },
+    { name: t("dashNav.inventory"), href: "/dashboard/inventory", icon: Boxes },
     { name: t("dashNav.payout"), href: "/dashboard/withdraw", icon: ArrowUpRight },
     { name: t("dashNav.settings"), href: "/dashboard/settings", icon: Settings },
   ];

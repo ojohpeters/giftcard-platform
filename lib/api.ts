@@ -315,6 +315,7 @@ export const steamAPI = {
   // Returns { redirect_to } — send the browser there to start Steam OpenID.
   login: () => api.get('/steam/login/'),
   account: () => api.get('/steam/account/'),
+  inventory: (refresh = false) => api.get('/steam/inventory/', { params: refresh ? { refresh: 1 } : {} }),
   updateTradeUrl: (trade_url: string) => api.post('/steam/trade-url/', { trade_url }),
   sync: () => api.post('/steam/sync/'),
   disconnect: () => api.post('/steam/disconnect/'),
